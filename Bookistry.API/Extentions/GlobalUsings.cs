@@ -1,0 +1,14 @@
+﻿global using Microsoft.AspNetCore.Identity;
+global using Bookistry.API.Extentions;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using Bookistry.API.Entities;
+global using Microsoft.EntityFrameworkCore;
+global using Bookistry.API.Persistences.Context;
+global using Serilog;
+global using Mapster;
+global using MapsterMapper;
+global using System.Reflection;
+global using FluentValidation;
+global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+global using System.Security.Claims;
+global using Bookistry.API.Settings;
