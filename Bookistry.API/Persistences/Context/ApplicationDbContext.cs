@@ -35,13 +35,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 entityEntry.Property(u => u.UpdatedById).CurrentValue = currentUserId;
                 entityEntry.Property(u => u.UpdatedOn).CurrentValue = DateTime.UtcNow;
             }
-            else if (entityEntry.State == EntityState.Deleted)
-            {
-                entityEntry.Property(d => d.DeletedById).CurrentValue = currentUserId;
-                entityEntry.Property(d => d.DeletedOn).CurrentValue = DateTime.UtcNow;
-            }
         }
 
         return base.SaveChangesAsync(cancellationToken);
     }
+    public DbSet<Book> Books => Set<Book>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<BookCategory> BookCategories => Set<BookCategory>();
+    public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<ReadingProgress> ReadingProgresses => Set<ReadingProgress>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
+    public DbSet<Payment> Payments => Set<Payment>();
+
 }
