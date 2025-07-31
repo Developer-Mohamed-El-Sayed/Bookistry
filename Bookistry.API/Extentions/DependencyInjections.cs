@@ -5,11 +5,12 @@ public static class DependencyInjections
     public static IServiceCollection AddDependenciesServices(this IServiceCollection services,IConfiguration configuration)
     {
         return services
-            .AddControllerConfig()
-            .AddConnectionConfig(configuration)
-            .AddMapsterConfig()
-            .AddValidationConfig()
-            .AddIdentityConfig();
+           .AddControllerConfig()
+           .AddMapsterConfig()
+           .AddValidationConfig()
+           .AddIdentityConfig()
+           .AddConnectionConfig(configuration)
+           .AddAuthenticationConfig(configuration);
     }
     private static IServiceCollection AddControllerConfig(this IServiceCollection services)
     {
@@ -43,6 +44,37 @@ public static class DependencyInjections
         {
             options.User.RequireUniqueEmail = true;
             options.Password.RequiredLength = 8;
+        });
+        return services;
+    }
+    private static IServiceCollection AddAuthenticationConfig(this IServiceCollection services,IConfiguration configuration)
+    {
+             services
+            .AddOptions<JwtOptions>()
+            .BindConfiguration(JwtOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ??
+            throw new InvalidOperationException($"Configuration section '{JwtOptions.SectionName}' not found or invalid.");
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtOptions.Audience,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
+
+            };
         });
         return services;
     }

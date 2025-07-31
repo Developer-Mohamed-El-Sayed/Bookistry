@@ -12,3 +12,7 @@ global using FluentValidation;
 global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 global using System.Security.Claims;
 global using Bookistry.API.Settings;
+global using System.ComponentModel.DataAnnotations;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.IdentityModel.Tokens;
+global using System.Text;

@@ -2,7 +2,8 @@
 
 public sealed class ApplicationUser : IdentityUser
 {
-    public string FullName { get; set; } = string.Empty;    
+    public string FirstName { get; set; } = string.Empty;    
+    public string LastName { get; set; } = string.Empty;    
     public bool IsDisabled { get; set; }
     public bool IsVIP { get; set; }
 }
