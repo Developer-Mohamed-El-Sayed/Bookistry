@@ -1,6 +1,6 @@
 ﻿namespace Bookistry.API.Entities;
 
-public sealed class ReadingProgress  : Auditable
+public sealed class ReadingProgress : Auditable
 {
     public Guid Id { get; set; } = Guid.CreateVersion7();
     public Guid BookId { get; set; }

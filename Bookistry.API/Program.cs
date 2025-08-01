@@ -9,7 +9,6 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var app = builder.Build();
 
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

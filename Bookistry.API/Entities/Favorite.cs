@@ -1,6 +1,6 @@
 ﻿namespace Bookistry.API.Entities;
 
-public sealed class Favorite  : Auditable
+public sealed class Favorite : Auditable
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 

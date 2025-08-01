@@ -2,13 +2,14 @@
 
 public static class DependencyInjections
 {
-    public static IServiceCollection AddDependenciesServices(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddDependenciesServices(this IServiceCollection services, IConfiguration configuration)
     {
         return services
            .AddControllerConfig()
            .AddMapsterConfig()
            .AddValidationConfig()
            .AddIdentityConfig()
+           .AddRegistrationConfig()
            .AddConnectionConfig(configuration)
            .AddAuthenticationConfig(configuration);
     }
@@ -17,7 +18,7 @@ public static class DependencyInjections
         services.AddControllers();
         return services;
     }
-    private static IServiceCollection AddConnectionConfig(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddConnectionConfig(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ??
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -37,7 +38,7 @@ public static class DependencyInjections
                 .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     private static IServiceCollection AddIdentityConfig(this IServiceCollection services)
     {
-        services.AddIdentity<ApplicationUser, IdentityRole>()
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
         services.Configure<IdentityOptions>(options =>
@@ -47,13 +48,13 @@ public static class DependencyInjections
         });
         return services;
     }
-    private static IServiceCollection AddAuthenticationConfig(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddAuthenticationConfig(this IServiceCollection services, IConfiguration configuration)
     {
-             services
-            .AddOptions<JwtOptions>()
-            .BindConfiguration(JwtOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        services
+       .AddOptions<JwtOptions>()
+       .BindConfiguration(JwtOptions.SectionName)
+       .ValidateDataAnnotations()
+       .ValidateOnStart();
         var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ??
             throw new InvalidOperationException($"Configuration section '{JwtOptions.SectionName}' not found or invalid.");
         services.AddAuthentication(options =>
@@ -78,5 +79,10 @@ public static class DependencyInjections
         });
         return services;
     }
-
+    private static IServiceCollection AddRegistrationConfig(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthServices, AuthServices>();
+        services.AddSingleton<IJwtProvider, JwtProvider>();
+        return services;
+    }
 }
