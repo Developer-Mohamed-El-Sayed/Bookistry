@@ -30,3 +30,5 @@ global using System.Text.Json;
 global using Bookistry.API.Errors;
 global using System.Security.Cryptography;
 global using Google.Apis.Auth;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Bookistry.API.Errors.Exceptions;

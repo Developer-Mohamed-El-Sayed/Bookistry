@@ -9,6 +9,7 @@ public static class DependencyInjections
            .AddMapsterConfig()
            .AddValidationConfig()
            .AddIdentityConfig()
+           .AddErrorHandling()
            .AddRegistrationConfig()
            .AddConnectionConfig(configuration)
            .AddAuthenticationConfig(configuration);
@@ -84,6 +85,12 @@ public static class DependencyInjections
     {
         services.AddScoped<IAuthServices, AuthServices>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
+        return services;
+    }
+    private static IServiceCollection AddErrorHandling(this IServiceCollection services)
+    {
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
         return services;
     }
 }
