@@ -20,10 +20,7 @@ public class AuthServices(
             return Result.Failure<AuthResponse>(UserErrors.DublicatedEmail);
         var user = request.Adapt<ApplicationUser>();
 
-        user.UserName = !string.IsNullOrEmpty(request.Email)
-            && request.Email.Contains('@')
-            ? request.Email.Split('@')[0]
-            : string.Empty;
+        user.UserName = GetUserName(request.Email);
 
         var result = await _userManager.CreateAsync(user, request.Password);
             await _userManager.AddToRoleAsync(user,DefaultRoles.Reader.Name);
@@ -45,6 +42,55 @@ public class AuthServices(
         return result.IsLockedOut
            ?  Result.Failure<AuthResponse>(UserErrors.UserLockedOut)
            : Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
+    }
+    public async Task<Result<AuthResponse>> SignInGoogleAsync(GoogleSignInRequest request)
+    {
+        if (await GoogleJsonWebSignature.ValidateAsync(request.IdToken) is not { } payload)
+            return Result.Failure<AuthResponse>(UserErrors.InvalidGoogleToken);
+
+        var user = await _userManager.FindByEmailAsync(payload.Email);
+
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                UserName = GetUserName(payload.Email),
+                Email = payload.Email,
+                FirstName = payload.GivenName ?? string.Empty,
+                LastName = payload.FamilyName ?? string.Empty,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+                return Result.Failure<AuthResponse>(UserErrors.UserCreationFailed);
+
+            await _userManager.AddToRoleAsync(user, DefaultRoles.Reader.Name);
+
+            var loginInfo = new UserLoginInfo(Providers.Google, payload.Subject, Providers.Google);
+            var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+            if (!addLoginResult.Succeeded)
+                return Result.Failure<AuthResponse>(UserErrors.ExternalLoginFailed);
+        }
+        else
+        {
+            if (user.IsDisabled)
+                return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
+
+            if (await _userManager.IsLockedOutAsync(user))
+                return Result.Failure<AuthResponse>(UserErrors.UserLockedOut);
+
+            var logins = await _userManager.GetLoginsAsync(user);
+            if (!logins.Any(x => x.LoginProvider == Providers.Google))
+            {
+                var loginInfo = new UserLoginInfo(Providers.Google, payload.Subject, Providers.Google);
+                var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+                if (!addLoginResult.Succeeded)
+                    return Result.Failure<AuthResponse>(UserErrors.ExternalLoginFailed);
+            }
+        }
+
+        return Result.Success(await GetAuthResponse(user));
     }
     private async Task<IEnumerable<string>> GetRolesAsync(ApplicationUser user) => 
          await _userManager.GetRolesAsync(user);
@@ -87,5 +133,12 @@ public class AuthServices(
             refreshTokenExpiration
         );
     }
+    private static string GetUserName(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+            return string.Empty;
+        return email.Split('@')[0];
+    }
+
 
 }

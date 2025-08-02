@@ -51,10 +51,11 @@ public static class DependencyInjections
     private static IServiceCollection AddAuthenticationConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services
-       .AddOptions<JwtOptions>()
-       .BindConfiguration(JwtOptions.SectionName)
-       .ValidateDataAnnotations()
-       .ValidateOnStart();
+           .AddOptions<JwtOptions>()
+           .BindConfiguration(JwtOptions.SectionName)
+           .ValidateDataAnnotations()
+           .ValidateOnStart();
+
         var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ??
             throw new InvalidOperationException($"Configuration section '{JwtOptions.SectionName}' not found or invalid.");
         services.AddAuthentication(options =>

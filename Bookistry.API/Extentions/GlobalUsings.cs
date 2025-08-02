@@ -29,3 +29,4 @@ global using System.Text;
 global using System.Text.Json;
 global using Bookistry.API.Errors;
 global using System.Security.Cryptography;
+global using Google.Apis.Auth;
