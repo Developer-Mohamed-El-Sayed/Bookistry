@@ -1,3 +1,6 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependenciesServices(builder.Configuration);
@@ -18,5 +21,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.MapHealthChecks("/status", new HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();

@@ -11,6 +11,7 @@ public static class DependencyInjections
            .AddIdentityConfig()
            .AddErrorHandling()
            .AddRegistrationConfig()
+           .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
            .AddAuthenticationConfig(configuration);
     }
@@ -91,6 +92,19 @@ public static class DependencyInjections
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+        return services;
+    }
+    private static IServiceCollection AddHealthCheckConfig(this IServiceCollection services,IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                  throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        services.AddHealthChecks()
+            .AddSqlServer(
+                connectionString: connectionString,
+                name: "BookistryDB",
+                failureStatus: HealthStatus.Unhealthy,
+                healthQuery: "SELECT 1;"
+            );
         return services;
     }
 }
