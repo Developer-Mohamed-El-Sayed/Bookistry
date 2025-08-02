@@ -1,4 +1,6 @@
-﻿namespace Bookistry.API.Extentions;
+﻿using System.Threading;
+
+namespace Bookistry.API.Extentions;
 
 public static class DependencyInjections
 {
@@ -103,7 +105,7 @@ public static class DependencyInjections
                 connectionString: connectionString,
                 name: "BookistryDB",
                 failureStatus: HealthStatus.Unhealthy,
-                healthQuery: "SELECT 1;"
+                tags: ["SQL","DB"]
             );
         return services;
     }
