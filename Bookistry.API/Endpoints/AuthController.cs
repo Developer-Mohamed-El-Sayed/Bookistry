@@ -10,4 +10,10 @@ public class AuthController(IAuthServices authServices) : ControllerBase
         var result = await _authServices.SignUpAsync(request,cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
+    [HttpPost("sign-in")]
+    public async Task<IActionResult> SignIn([FromBody] SignInRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authServices.SignInAsync(request, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
 }

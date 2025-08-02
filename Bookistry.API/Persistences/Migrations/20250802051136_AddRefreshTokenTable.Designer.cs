@@ -4,6 +4,7 @@ using Bookistry.API.Persistences.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookistry.API.Persistences.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250802051136_AddRefreshTokenTable")]
+    partial class AddRefreshTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,15 +75,6 @@ namespace Bookistry.API.Persistences.Migrations
                             IsDeleted = false,
                             Name = "Reader",
                             NormalizedName = "READER"
-                        },
-                        new
-                        {
-                            Id = "8757DDE1-DA74-4A92-9EEB-46C4A35AC090",
-                            ConcurrencyStamp = "F167EA47-FC22-4A47-81F9-1E21C11DB217",
-                            IsDefault = false,
-                            IsDeleted = false,
-                            Name = "Developer",
-                            NormalizedName = "DEVELOPER"
                         });
                 });
 
@@ -168,51 +162,6 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "9422E5CF-06D6-422D-B3A6-C7E1E34B3A1C",
-                            Email = "admin@mahmoud.com",
-                            EmailConfirmed = true,
-                            FirstName = "Mahmoud",
-                            IsDisabled = false,
-                            IsVIP = true,
-                            LastName = "Yasser",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@MAHMOUD.COM",
-                            NormalizedUserName = "ADMIN@MAHMOUD.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
-                            PhoneNumberConfirmed = false,
-                            ProfileImageUrl = "",
-                            SecurityStamp = "78A73231C42F47D4B13D2CF4A3672B51",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@mahmoud.com"
-                        },
-                        new
-                        {
-                            Id = "4E14506C-D3C0-4AE3-8616-5EB95A764358",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "CE9E600E-ECD5-4400-92E6-986F63EEC953",
-                            Email = "dev@mohamed.com",
-                            EmailConfirmed = true,
-                            FirstName = "Mohamed",
-                            IsDisabled = false,
-                            IsVIP = true,
-                            LastName = "El Sayed",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "DEV@MOHAMED.COM",
-                            NormalizedUserName = "DEV@MOHAMED.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGBGVUvSYxVEnNBXm5kHe/mW8CYkFMU3yKabkMNZUl35T1pl1Qh165+GvKM0kus7qQ==",
-                            PhoneNumber = "+201002308834",
-                            PhoneNumberConfirmed = true,
-                            ProfileImageUrl = "",
-                            SecurityStamp = "2FCB053BC1F041F2B07D3E7608D8020E",
-                            TwoFactorEnabled = false,
-                            UserName = "dev@mohamed.com"
-                        });
                 });
 
             modelBuilder.Entity("Bookistry.API.Entities.Book", b =>
@@ -661,18 +610,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
-                            RoleId = "868826A7-5589-4BF0-82DA-5E04408ADC8F"
-                        },
-                        new
-                        {
-                            UserId = "4E14506C-D3C0-4AE3-8616-5EB95A764358",
-                            RoleId = "8757DDE1-DA74-4A92-9EEB-46C4A35AC090"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

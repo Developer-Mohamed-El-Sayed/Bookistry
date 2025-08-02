@@ -9,6 +9,7 @@ public static class ResultExtention
         var problem = Results.Problem(statusCode: result.Error.StatusCode);
         var problemDetails = problem.GetType().GetProperty(nameof(ProblemDetails))!.GetValue(problem) as ProblemDetails ??
              throw new InvalidOperationException("ProblemDetails is null.");
+
         problemDetails.Extensions = new Dictionary<string, object?>
         {
             {

@@ -10,8 +10,6 @@ public class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
             new(JwtRegisteredClaimNames.Sub, user.Id),
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.GivenName, user.FirstName!),
-            new(JwtRegisteredClaimNames.FamilyName, user.LastName!),
             new(nameof(roles),JsonSerializer.Serialize(roles),JsonClaimValueTypes.JsonArray)
         ];
         var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));

@@ -14,4 +14,5 @@ public sealed class ApplicationUser : IdentityUser
     public ICollection<Subscription> Subscriptions { get; set; } = [];
     public ICollection<Favorite> Favorites { get; set; } = [];
     public ICollection<Payment> Payments { get; set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }

@@ -8,7 +8,6 @@ public class MappingConfiguration : IRegister
             .Map(dest => dest.EmailConfirmed, src => true)
             .Map(dest => dest.FirstName, src => GetFirstName(src.FullName))
             .Map(dest => dest.LastName, src => GetLastName(src.FullName));
-
     }
     private static string GetFirstName(string fullName)
     {

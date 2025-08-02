@@ -19,6 +19,13 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
                 NormalizedName = DefaultRoles.Reader.Name.ToUpper(),
                 ConcurrencyStamp = DefaultRoles.Reader.ConcurrencyStamp,
                 IsDefault = true
+            },
+            new ApplicationRole
+            {
+                Id = DefaultRoles.Developer.Id,
+                Name = DefaultRoles.Developer.Name,
+                NormalizedName = DefaultRoles.Developer.Name.ToUpper(),
+                ConcurrencyStamp = DefaultRoles.Developer.ConcurrencyStamp
             }
         ]);
     }

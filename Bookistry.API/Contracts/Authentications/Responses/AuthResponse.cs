@@ -5,7 +5,8 @@ public record AuthResponse(
     string Email,
     string FullName,
     string Token,
-    int TokenExpirationPerMinute
-// refresh token, refresh token expiration  Date time , etc. can be added later
+    int ExpiresIn,
+    string RefreshToken,
+    DateTime RefreshTokenExpiration
 );
 

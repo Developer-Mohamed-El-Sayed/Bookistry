@@ -1,17 +1,16 @@
 ﻿namespace Bookistry.API.Services;
 
 public class AuthServices(
-        ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        IJwtProvider jwtProvider
+        IJwtProvider jwtProvider,
+        SignInManager<ApplicationUser> signInManager
     )
     : IAuthServices
 {
-    private readonly ApplicationDbContext _context = context;
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private const int _refreshTokenExpirationDays = 30;
 
     public async Task<Result<AuthResponse>> SignUpAsync(SignUpRequest request, CancellationToken cancellationToken = default)
     {
@@ -27,24 +26,25 @@ public class AuthServices(
             : string.Empty;
 
         var result = await _userManager.CreateAsync(user, request.Password);
-        if (result.Succeeded)
-        {
             await _userManager.AddToRoleAsync(user,DefaultRoles.Reader.Name);
-            var userRoles = await GetRolesAsync(user);
-            var (token,expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
-            await _userManager.UpdateAsync(user);
-            var response = new AuthResponse(
-                user.Id,
-                user.Email!,
-                GetFullName(user.FirstName,user.LastName),
-                token,
-                expiresIn
-            );
-            return Result.Success(response);
-            // TODO: send registration email Done
-        }
+        if (result.Succeeded)
+            return Result.Success(await GetAuthResponse(user));
         var error = result.Errors.First();
         return Result.Failure<AuthResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+    }
+    public async Task<Result<AuthResponse>> SignInAsync(SignInRequest request, CancellationToken cancellationToken = default)
+    {
+        if(await _userManager.FindByEmailAsync(request.Email) is not { } user)
+            return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
+        var result = await _signInManager.PasswordSignInAsync(user,request.Password, false, true);
+        // TODO: check if user is vip true
+        if (result.Succeeded)
+            return Result.Success(await GetAuthResponse(user));
+        return result.IsLockedOut
+           ?  Result.Failure<AuthResponse>(UserErrors.UserLockedOut)
+           : Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
     }
     private async Task<IEnumerable<string>> GetRolesAsync(ApplicationUser user) => 
          await _userManager.GetRolesAsync(user);
@@ -63,4 +63,29 @@ public class AuthServices(
         }
         return builder.ToString();
     }
+    private static string GenerateRefreshToken() =>
+        Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    private async Task<AuthResponse> GetAuthResponse(ApplicationUser user)
+    {
+        var userRoles = await GetRolesAsync(user);
+        var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
+        var refreshToken = GenerateRefreshToken();
+        var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpirationDays);
+        user.RefreshTokens.Add(new RefreshToken
+        {
+            Token = refreshToken,
+            ExpiresOn = refreshTokenExpiration
+        });
+        await _userManager.UpdateAsync(user);
+        return new AuthResponse(
+            user.Id,
+            user.Email!,
+            GetFullName(user.FirstName, user.LastName),
+            token,
+            expiresIn,
+            refreshToken,
+            refreshTokenExpiration
+        );
+    }
+
 }
