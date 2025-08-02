@@ -33,3 +33,7 @@ global using Google.Apis.Auth;
 global using Microsoft.AspNetCore.Diagnostics;
 global using Bookistry.API.Errors.Exceptions;
 global using Microsoft.Extensions.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.RateLimiting;
+global using System.Threading.RateLimiting;
+global using HealthChecks.UI.Client;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;

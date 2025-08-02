@@ -1,6 +1,7 @@
 ﻿namespace Bookistry.API.Endpoints;
 [Route("auth")]
 [ApiController]
+[EnableRateLimiting(RateLimit.IpLimit)]
 public class AuthController(IAuthServices authServices) : ControllerBase
 {
     private readonly IAuthServices _authServices = authServices;

@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace Bookistry.API.Extentions;
+﻿namespace Bookistry.API.Extentions;
 
 public static class DependencyInjections
 {
@@ -13,6 +11,7 @@ public static class DependencyInjections
            .AddIdentityConfig()
            .AddErrorHandling()
            .AddRegistrationConfig()
+           .AddRateLimitConfig()
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
            .AddAuthenticationConfig(configuration);
@@ -107,6 +106,37 @@ public static class DependencyInjections
                 failureStatus: HealthStatus.Unhealthy,
                 tags: ["SQL","DB"]
             );
+        return services;
+    }
+    private static IServiceCollection AddRateLimitConfig(this IServiceCollection services)
+    {
+        services.AddRateLimiter(rateLimiterOptions =>
+        {
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            rateLimiterOptions.AddTokenBucketLimiter(RateLimit.TokenLimit, options =>
+            {
+                options.TokenLimit = 50; 
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                options.QueueLimit = 5;
+                options.AutoReplenishment = true;
+                options.TokensPerPeriod = 5; 
+                options.ReplenishmentPeriod = TimeSpan.FromSeconds(1);
+            });
+
+            rateLimiterOptions.AddPolicy(RateLimit.IpLimit, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 30, 
+                        Window = TimeSpan.FromSeconds(10),
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit = 5,
+                        AutoReplenishment = true
+                    }
+                )
+            );
+        });
         return services;
     }
 }
