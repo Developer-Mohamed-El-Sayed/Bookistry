@@ -12,6 +12,7 @@ public static class DependencyInjections
            .AddErrorHandling()
            .AddRegistrationConfig()
            .AddRateLimitConfig()
+           .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
            .AddAuthenticationConfig(configuration);
@@ -137,6 +138,18 @@ public static class DependencyInjections
                 )
             );
         });
+        return services;
+    }
+    private static IServiceCollection AddCORSConfig(this IServiceCollection services,IConfiguration configuration)
+    {
+        services.AddCors(option =>
+            option.AddDefaultPolicy(
+                builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
+            )
+        );
         return services;
     }
 }
