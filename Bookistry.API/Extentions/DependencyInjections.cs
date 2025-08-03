@@ -12,6 +12,7 @@ public static class DependencyInjections
            .AddErrorHandling()
            .AddRegistrationConfig()
            .AddRateLimitConfig()
+           .AddRequestFilterConfig(configuration)
            .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
@@ -150,6 +151,11 @@ public static class DependencyInjections
                 .WithOrigins(configuration.GetSection("AllowedOrigins").Get<string[]>()!)
             )
         );
+        return services;
+    }
+    private static IServiceCollection AddRequestFilterConfig(this IServiceCollection services,IConfiguration configuration)
+    {
+        services.Configure<RequestFilters>(configuration.GetSection(nameof(RequestFilters)));
         return services;
     }
 }

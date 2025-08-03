@@ -37,3 +37,4 @@ global using Microsoft.AspNetCore.RateLimiting;
 global using System.Threading.RateLimiting;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Bookistry.API.Contracts.Common;
