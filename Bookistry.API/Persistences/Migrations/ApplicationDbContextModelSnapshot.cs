@@ -79,8 +79,8 @@ namespace Bookistry.API.Persistences.Migrations
                             ConcurrencyStamp = "F167EA47-FC22-4A47-81F9-1E21C11DB217",
                             IsDefault = false,
                             IsDeleted = false,
-                            Name = "Developer",
-                            NormalizedName = "DEVELOPER"
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
                         });
                 });
 
@@ -205,7 +205,7 @@ namespace Bookistry.API.Persistences.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "DEV@MOHAMED.COM",
                             NormalizedUserName = "DEV@MOHAMED.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGBGVUvSYxVEnNBXm5kHe/mW8CYkFMU3yKabkMNZUl35T1pl1Qh165+GvKM0kus7qQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
                             PhoneNumber = "+201002308834",
                             PhoneNumberConfirmed = true,
                             ProfileImageUrl = "",
@@ -229,11 +229,6 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasPrecision(3, 2)
                         .HasColumnType("float(3)");
 
-                    b.Property<string>("CoverImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -254,11 +249,6 @@ namespace Bookistry.API.Persistences.Migrations
 
                     b.Property<int>("PageCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("PdfFileUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("PublishedOn")
                         .HasColumnType("datetime2");
@@ -743,7 +733,75 @@ namespace Bookistry.API.Persistences.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedById");
 
+                    b.OwnsOne("Bookistry.API.Entities.UploadedFile", "CoverImageUpload", b1 =>
+                        {
+                            b1.Property<Guid>("BookId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FileExtension")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FileName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("StoredFileName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("BookId");
+
+                            b1.ToTable("Books");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookId");
+                        });
+
+                    b.OwnsOne("Bookistry.API.Entities.UploadedFile", "PdfFileUpload", b1 =>
+                        {
+                            b1.Property<Guid>("BookId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("FileExtension")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<string>("FileName")
+                                .IsRequired()
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
+
+                            b1.Property<string>("StoredFileName")
+                                .IsRequired()
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
+
+                            b1.HasKey("BookId");
+
+                            b1.ToTable("BookCoverImages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookId");
+                        });
+
                     b.Navigation("Author");
+
+                    b.Navigation("CoverImageUpload")
+                        .IsRequired();
+
+                    b.Navigation("PdfFileUpload")
+                        .IsRequired();
 
                     b.Navigation("UpdatedBy");
                 });

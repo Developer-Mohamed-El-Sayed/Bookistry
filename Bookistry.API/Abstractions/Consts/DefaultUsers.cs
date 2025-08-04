@@ -12,7 +12,7 @@ public static class DefaultUsers
         public const string  LastName = "Yasser";
         public const string  Password = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q=="; // P@ssword123
     }
-    public partial class Devloper //TODO : Remove this user in the future Developer is not a role in Bookistry
+    public partial class Admin
     {
         public const string Id = "4E14506C-D3C0-4AE3-8616-5EB95A764358";
         public const string ConcurrencyStamp = "CE9E600E-ECD5-4400-92E6-986F63EEC953";
@@ -21,6 +21,6 @@ public static class DefaultUsers
         public const string FirstName = "Mohamed";
         public const string LastName = "El Sayed";
         public const string PhoneNumber = "+201002308834";
-        public const string Password = "AQAAAAIAAYagAAAAEGBGVUvSYxVEnNBXm5kHe/mW8CYkFMU3yKabkMNZUl35T1pl1Qh165+GvKM0kus7qQ=="; // P@ssword2004
+        public const string Password = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q=="; // P@ssword123
     }
 }

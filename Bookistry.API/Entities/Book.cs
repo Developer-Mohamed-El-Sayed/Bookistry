@@ -5,11 +5,11 @@ public sealed class Book : Auditable
     public Guid Id { get; set; } = Guid.CreateVersion7();
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string CoverImageUrl { get; set; } = string.Empty;
-    public string PdfFileUrl { get; set; } = string.Empty;
+    public UploadedFile CoverImageUpload { get; set; } = default!;
+    public UploadedFile PdfFileUpload { get; set; } = default!;
     public DateTime PublishedOn { get; set; } = DateTime.UtcNow;
     public bool IsVIP { get; set; }
-    public double AverageRating { get; set; }
+    public double AverageRating { get; set; } // average rating of all reviews
     public int ViewCount { get; set; }
     public int DownloadCount { get; set; }
     public int PageCount { get; set; }

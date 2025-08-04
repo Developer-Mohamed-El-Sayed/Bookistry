@@ -15,14 +15,6 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
                .IsRequired()
                .HasMaxLength(2000);
 
-        builder.Property(c => c.CoverImageUrl)
-               .IsRequired()
-               .HasMaxLength(500);
-
-        builder.Property(p => p.PdfFileUrl)
-               .IsRequired()
-               .HasMaxLength(500);
-
         builder.Property(p => p.PublishedOn)
                .IsRequired();
 
@@ -44,5 +36,28 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
         builder.HasOne(b => b.Author)
         .WithMany(u => u.Books)
         .HasForeignKey(b => b.AuthorId);
+
+
+        builder
+            .OwnsOne(p => p.PdfFileUpload, pdf =>
+            {
+                pdf.ToTable("BookPdfFiles");
+                pdf.WithOwner().HasForeignKey("BookId");
+                pdf.Property(x => x.FileName).HasMaxLength(250);
+                pdf.Property(x => x.StoredFileName).HasMaxLength(250);
+                pdf.Property(x => x.FileExtension).HasMaxLength(10);
+                pdf.Property(x => x.ContentType).HasMaxLength(50);                
+            });
+
+        builder
+            .OwnsOne(i => i.PdfFileUpload, img =>
+            {
+                img.ToTable("BookCoverImages");
+                img.WithOwner().HasForeignKey("BookId");
+                img.Property(x => x.FileName).HasMaxLength(250);
+                img.Property(x => x.StoredFileName).HasMaxLength(250);
+                img.Property(x => x.FileExtension).HasMaxLength(10);
+                img.Property(x => x.ContentType).HasMaxLength(50);
+            });
     }
 }

@@ -2,9 +2,9 @@
 [Route("auth")]
 [ApiController]
 [EnableRateLimiting(RateLimit.IpLimit)]
-public class AuthController(IAuthServices authServices) : ControllerBase
+public class AuthController(IAuthService authServices) : ControllerBase
 {
-    private readonly IAuthServices _authServices = authServices;
+    private readonly IAuthService _authServices = authServices;
     [HttpPost("sign-up")]
     public async Task<IActionResult> SignUp([FromBody] SignUpRequest request,CancellationToken cancellationToken)
     {

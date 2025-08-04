@@ -22,10 +22,10 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
             },
             new ApplicationRole
             {
-                Id = DefaultRoles.Developer.Id,
-                Name = DefaultRoles.Developer.Name,
-                NormalizedName = DefaultRoles.Developer.Name.ToUpper(),
-                ConcurrencyStamp = DefaultRoles.Developer.ConcurrencyStamp
+                Id = DefaultRoles.Admin.Id,
+                Name = DefaultRoles.Admin.Name,
+                NormalizedName = DefaultRoles.Admin.Name.ToUpper(),
+                ConcurrencyStamp = DefaultRoles.Admin.ConcurrencyStamp
             }
         ]);
     }

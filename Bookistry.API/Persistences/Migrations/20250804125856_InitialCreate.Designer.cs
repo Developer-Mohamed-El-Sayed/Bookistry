@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookistry.API.Persistences.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250731125903_InitialCreate")]
+    [Migration("20250804125856_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -56,6 +56,35 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "868826A7-5589-4BF0-82DA-5E04408ADC8F",
+                            ConcurrencyStamp = "13071EF4-9B9D-4594-804F-1E8650DA4417",
+                            IsDefault = false,
+                            IsDeleted = false,
+                            Name = "Author",
+                            NormalizedName = "AUTHOR"
+                        },
+                        new
+                        {
+                            Id = "4D447E8A-B35A-4DAE-BCE3-4552BF828693",
+                            ConcurrencyStamp = "E9FD0D85-6770-4A99-B3A2-69158B9EF3D7",
+                            IsDefault = true,
+                            IsDeleted = false,
+                            Name = "Reader",
+                            NormalizedName = "READER"
+                        },
+                        new
+                        {
+                            Id = "8757DDE1-DA74-4A92-9EEB-46C4A35AC090",
+                            ConcurrencyStamp = "F167EA47-FC22-4A47-81F9-1E21C11DB217",
+                            IsDefault = false,
+                            IsDeleted = false,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Bookistry.API.Entities.ApplicationUser", b =>
@@ -142,6 +171,51 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "9422E5CF-06D6-422D-B3A6-C7E1E34B3A1C",
+                            Email = "admin@mahmoud.com",
+                            EmailConfirmed = true,
+                            FirstName = "Mahmoud",
+                            IsDisabled = false,
+                            IsVIP = true,
+                            LastName = "Yasser",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@MAHMOUD.COM",
+                            NormalizedUserName = "ADMIN@MAHMOUD.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
+                            PhoneNumberConfirmed = false,
+                            ProfileImageUrl = "",
+                            SecurityStamp = "78A73231C42F47D4B13D2CF4A3672B51",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@mahmoud.com"
+                        },
+                        new
+                        {
+                            Id = "4E14506C-D3C0-4AE3-8616-5EB95A764358",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "CE9E600E-ECD5-4400-92E6-986F63EEC953",
+                            Email = "dev@mohamed.com",
+                            EmailConfirmed = true,
+                            FirstName = "Mohamed",
+                            IsDisabled = false,
+                            IsVIP = true,
+                            LastName = "El Sayed",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "DEV@MOHAMED.COM",
+                            NormalizedUserName = "DEV@MOHAMED.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
+                            PhoneNumber = "+201002308834",
+                            PhoneNumberConfirmed = true,
+                            ProfileImageUrl = "",
+                            SecurityStamp = "2FCB053BC1F041F2B07D3E7608D8020E",
+                            TwoFactorEnabled = false,
+                            UserName = "dev@mohamed.com"
+                        });
                 });
 
             modelBuilder.Entity("Bookistry.API.Entities.Book", b =>
@@ -158,10 +232,12 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasPrecision(3, 2)
                         .HasColumnType("float(3)");
 
-                    b.Property<string>("CoverImageUrl")
+                    b.Property<string>("CreatedById")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -177,11 +253,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<int>("PageCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("PdfFileUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<DateTime>("PublishedOn")
                         .HasColumnType("datetime2");
 
@@ -189,6 +260,12 @@ namespace Bookistry.API.Persistences.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("ViewCount")
                         .HasColumnType("int");
@@ -204,6 +281,8 @@ namespace Bookistry.API.Persistences.Migrations
                     b.HasIndex("PublishedOn");
 
                     b.HasIndex("Title");
+
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Books");
                 });
@@ -229,6 +308,13 @@ namespace Bookistry.API.Persistences.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -239,10 +325,18 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
+
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Categories");
                 });
@@ -256,11 +350,26 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<Guid>("BookId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -275,6 +384,13 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
@@ -302,6 +418,12 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -309,6 +431,8 @@ namespace Bookistry.API.Persistences.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubscriptionId");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -324,10 +448,23 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<Guid>("BookId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CurrentPage")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LastReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -335,6 +472,8 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -358,6 +497,13 @@ namespace Bookistry.API.Persistences.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
@@ -365,11 +511,19 @@ namespace Bookistry.API.Persistences.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
                     b.HasIndex("ReviewerId");
+
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Reviews");
                 });
@@ -380,6 +534,13 @@ namespace Bookistry.API.Persistences.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -389,11 +550,19 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId", "EndDate");
 
@@ -485,6 +654,18 @@ namespace Bookistry.API.Persistences.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
+                            RoleId = "868826A7-5589-4BF0-82DA-5E04408ADC8F"
+                        },
+                        new
+                        {
+                            UserId = "4E14506C-D3C0-4AE3-8616-5EB95A764358",
+                            RoleId = "8757DDE1-DA74-4A92-9EEB-46C4A35AC090"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -506,6 +687,43 @@ namespace Bookistry.API.Persistences.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Bookistry.API.Entities.ApplicationUser", b =>
+                {
+                    b.OwnsMany("Bookistry.API.Entities.RefreshToken", "RefreshTokens", b1 =>
+                        {
+                            b1.Property<string>("UserId")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<DateTime>("CreatedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime>("ExpiresOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("RevokedOn")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("UserId", "Id");
+
+                            b1.ToTable("RefreshTokens", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("RefreshTokens");
+                });
+
             modelBuilder.Entity("Bookistry.API.Entities.Book", b =>
                 {
                     b.HasOne("Bookistry.API.Entities.ApplicationUser", "Author")
@@ -514,7 +732,81 @@ namespace Bookistry.API.Persistences.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
+                    b.OwnsOne("Bookistry.API.Entities.UploadedFile", "CoverImageUpload", b1 =>
+                        {
+                            b1.Property<Guid>("BookId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FileExtension")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("FileName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("StoredFileName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("BookId");
+
+                            b1.ToTable("Books");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookId");
+                        });
+
+                    b.OwnsOne("Bookistry.API.Entities.UploadedFile", "PdfFileUpload", b1 =>
+                        {
+                            b1.Property<Guid>("BookId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("FileExtension")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.Property<string>("FileName")
+                                .IsRequired()
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
+
+                            b1.Property<string>("StoredFileName")
+                                .IsRequired()
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
+
+                            b1.HasKey("BookId");
+
+                            b1.ToTable("BookCoverImages", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookId");
+                        });
+
                     b.Navigation("Author");
+
+                    b.Navigation("CoverImageUpload")
+                        .IsRequired();
+
+                    b.Navigation("PdfFileUpload")
+                        .IsRequired();
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Bookistry.API.Entities.BookCategory", b =>
@@ -536,6 +828,15 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Bookistry.API.Entities.Category", b =>
+                {
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Bookistry.API.Entities.Favorite", b =>
                 {
                     b.HasOne("Bookistry.API.Entities.Book", "Book")
@@ -544,6 +845,10 @@ namespace Bookistry.API.Persistences.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.HasOne("Bookistry.API.Entities.ApplicationUser", "User")
                         .WithMany("Favorites")
                         .HasForeignKey("UserId")
@@ -551,6 +856,8 @@ namespace Bookistry.API.Persistences.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });
@@ -563,6 +870,10 @@ namespace Bookistry.API.Persistences.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.HasOne("Bookistry.API.Entities.ApplicationUser", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId")
@@ -570,6 +881,8 @@ namespace Bookistry.API.Persistences.Migrations
                         .IsRequired();
 
                     b.Navigation("Subscription");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });
@@ -582,6 +895,10 @@ namespace Bookistry.API.Persistences.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.HasOne("Bookistry.API.Entities.ApplicationUser", "User")
                         .WithMany("ReadingProgresses")
                         .HasForeignKey("UserId")
@@ -589,6 +906,8 @@ namespace Bookistry.API.Persistences.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });
@@ -607,18 +926,30 @@ namespace Bookistry.API.Persistences.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.Navigation("Book");
 
                     b.Navigation("Reviewer");
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Bookistry.API.Entities.Subscription", b =>
                 {
+                    b.HasOne("Bookistry.API.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.HasOne("Bookistry.API.Entities.ApplicationUser", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });

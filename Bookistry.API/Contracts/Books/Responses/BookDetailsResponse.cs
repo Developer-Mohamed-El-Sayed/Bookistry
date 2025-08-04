@@ -14,5 +14,5 @@ public record BookDetailsResponse(
     int PageCount,
     string AuthorFullName
 // TODO: Add IEnumerable<ReviewResponse> Reviews when review feature is ready
-// IEnumerable<gategoryresponse> Categories // Uncomment when categories are implemented
+// TODO: IEnumerable<gategoryresponse> Categories // Uncomment when categories are implemented
 );

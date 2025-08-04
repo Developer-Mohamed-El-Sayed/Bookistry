@@ -12,8 +12,8 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<IdentityUserRole<s
             },
             new IdentityUserRole<string>
             {
-                UserId = DefaultUsers.Devloper.Id,
-                RoleId = DefaultRoles.Developer.Id
+                UserId = DefaultUsers.Admin.Id,
+                RoleId = DefaultRoles.Admin.Id
             }
         ]);
     }

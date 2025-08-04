@@ -8,6 +8,14 @@ public class MappingConfiguration : IRegister
             .Map(dest => dest.EmailConfirmed, src => true)
             .Map(dest => dest.FirstName, src => GetFirstName(src.FullName))
             .Map(dest => dest.LastName, src => GetLastName(src.FullName));
+
+        config.NewConfig<Book, BookResponse>()
+            .Map(dest => dest.AuthorFullName, src => $"{src.Author.FirstName.Trim()} {src.Author.LastName.Trim()}");
+
+        config.NewConfig<CategoryRequest, Category>()
+            .Map(dest => dest.Name, src => src.Title);
+        config.NewConfig<Category, CategoryResponse>()
+            .Map(dest => dest.Title, src => src.Name);
     }
     private static string GetFirstName(string fullName)
     {

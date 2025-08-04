@@ -12,7 +12,6 @@ public static class DependencyInjections
            .AddErrorHandling()
            .AddRegistrationConfig()
            .AddRateLimitConfig()
-           .AddRequestFilterConfig(configuration)
            .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
@@ -25,8 +24,7 @@ public static class DependencyInjections
     }
     private static IServiceCollection AddConnectionConfig(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        var connectionString = GetConnectionString(configuration);
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
         return services;
@@ -87,7 +85,9 @@ public static class DependencyInjections
     }
     private static IServiceCollection AddRegistrationConfig(this IServiceCollection services)
     {
-        services.AddScoped<IAuthServices, AuthServices>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IBookService, BookService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
         return services;
     }
@@ -99,8 +99,7 @@ public static class DependencyInjections
     }
     private static IServiceCollection AddHealthCheckConfig(this IServiceCollection services,IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                  throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        var connectionString = GetConnectionString(configuration);
         services.AddHealthChecks()
             .AddSqlServer(
                 connectionString: connectionString,
@@ -153,9 +152,10 @@ public static class DependencyInjections
         );
         return services;
     }
-    private static IServiceCollection AddRequestFilterConfig(this IServiceCollection services,IConfiguration configuration)
+    private static string GetConnectionString(IConfiguration configuration)
     {
-        services.Configure<RequestFilters>(configuration.GetSection(nameof(RequestFilters)));
-        return services;
+        string connectionString = configuration.GetConnectionString("DefaultConnection") ??
+          throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        return connectionString;
     }
 }

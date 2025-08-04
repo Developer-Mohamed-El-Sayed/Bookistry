@@ -1,11 +1,11 @@
 ﻿namespace Bookistry.API.Services;
 
-public class AuthServices(
+public class AuthService(
         UserManager<ApplicationUser> userManager,
         IJwtProvider jwtProvider,
         SignInManager<ApplicationUser> signInManager
     )
-    : IAuthServices
+    : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;

@@ -38,3 +38,8 @@ global using System.Threading.RateLimiting;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Bookistry.API.Contracts.Common;
+global using Bookistry.API.Contracts.Books.Responses;
+global using Microsoft.AspNetCore.Authorization;
+global using Bookistry.API.Contracts.Books.Requests;
+global using Bookistry.API.Contracts.Categories.Requests;
+global using Bookistry.API.Contracts.Categories.Responses;

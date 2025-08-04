@@ -1,8 +1,9 @@
 ﻿namespace Bookistry.API.Contracts.Common;
 
-public record RequestFilters(
-    int PageNumber,
-    int PageSize,
-    string? SearchTerm,
-    string? FilterBy
-);
+public record RequestFilters
+{
+   public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
+    public string? SearchTerm {get;init;}
+   public string? FilterBy { get; init; }
+}
