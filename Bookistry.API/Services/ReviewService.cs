@@ -41,5 +41,5 @@ public class ReviewService(ApplicationDbContext context) : IReviewService
          await _context.Books
             .AnyAsync(b => b.Id == bookId, cancellationToken);
     
-    
+  
 }
