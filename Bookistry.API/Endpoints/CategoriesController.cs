@@ -13,7 +13,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return result.IsSuccess ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value) : result.ToProblem();
     }
     [HttpGet("{id}")]
-    [Authorize(Roles = DefaultRoles.Reader.Name)]
+    [Authorize]
     public async Task<IActionResult> Get([FromRoute]Guid id, CancellationToken cancellationToken)
     {
         var result = await _categoryService.GetAsync(id, cancellationToken);

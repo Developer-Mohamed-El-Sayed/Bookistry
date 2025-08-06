@@ -17,7 +17,7 @@ public class AuthController(IAuthService authServices) : ControllerBase
         var result = await _authServices.SignInAsync(request, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
-    [HttpPost("sign-in-google")]
+    [HttpPost("sign-in/google")]
     public async Task<IActionResult> SignInGoogle([FromBody] GoogleSignInRequest request)
     {
         var result = await _authServices.SignInGoogleAsync(request);

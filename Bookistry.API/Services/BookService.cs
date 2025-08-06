@@ -11,8 +11,8 @@ public class BookService(ApplicationDbContext context) : IBookService
             .Where(x =>
             (string.IsNullOrEmpty(filters.SearchTerm) || x.Title.Contains(filters.SearchTerm)) &&
             (string.IsNullOrEmpty(filters.FilterBy) ||
-            (filters.FilterBy == BookType.Vip && x.IsVIP) ||
-            (filters.FilterBy == BookType.Free && !x.IsVIP)))
+            (filters.FilterBy == SubscriptionType.VIP && x.IsVIP) ||
+            (filters.FilterBy == SubscriptionType.Free && !x.IsVIP)))
             .ProjectToType<BookResponse>()
             .AsNoTracking();
 

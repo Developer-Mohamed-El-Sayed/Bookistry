@@ -23,5 +23,8 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .HasOne(r => r.Reviewer)
             .WithMany(u => u.Reviews)
             .HasForeignKey(r => r.ReviewerId);
+        
+        builder.HasIndex(r => new { r.BookId, r.ReviewerId })
+            .IsUnique();
     }
 }

@@ -16,6 +16,9 @@ public class MappingConfiguration : IRegister
             .Map(dest => dest.Name, src => src.Title);
         config.NewConfig<Category, CategoryResponse>()
             .Map(dest => dest.Title, src => src.Name);
+
+        config.NewConfig<Review, ReviewResponse>()
+            .Map(dest => dest.UserName, src => src.Reviewer.UserName);
     }
     private static string GetFirstName(string fullName)
     {

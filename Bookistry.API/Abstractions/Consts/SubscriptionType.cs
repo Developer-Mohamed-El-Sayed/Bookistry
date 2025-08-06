@@ -1,7 +1,7 @@
 ﻿namespace Bookistry.API.Abstractions.Consts;
 
-public static class BookType
+public static class SubscriptionType
 {
-    public const string Vip = nameof(Vip);
+    public const string VIP = nameof(VIP);
     public const string Free = nameof(Free);
 }

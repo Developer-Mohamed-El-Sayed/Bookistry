@@ -41,7 +41,7 @@ public class AuthService(
             return Result.Success(await GetAuthResponse(user));
         return result.IsLockedOut
            ?  Result.Failure<AuthResponse>(UserErrors.UserLockedOut)
-           : Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
+           : Result.Failure<AuthResponse>(UserErrors.InvalidCredentials with { StatusCode = StatusCodes.Status400BadRequest });
     }
     public async Task<Result<AuthResponse>> SignInGoogleAsync(GoogleSignInRequest request)
     {

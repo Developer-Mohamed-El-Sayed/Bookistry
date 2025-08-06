@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Bookistry.API.Persistences.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCteate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -172,10 +172,6 @@ namespace Bookistry.API.Persistences.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    CoverImageUpload_FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverImageUpload_StoredFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverImageUpload_ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverImageUpload_FileExtension = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublishedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsVIP = table.Column<bool>(type: "bit", nullable: false),
                     AverageRating = table.Column<double>(type: "float(3)", precision: 3, scale: 2, nullable: false),
@@ -294,6 +290,27 @@ namespace Bookistry.API.Persistences.Migrations
                     table.PrimaryKey("PK_BookCoverImages", x => x.BookId);
                     table.ForeignKey(
                         name: "FK_BookCoverImages_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookPdfFiles",
+                columns: table => new
+                {
+                    BookId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    StoredFileName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    FileExtension = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookPdfFiles", x => x.BookId);
+                    table.ForeignKey(
+                        name: "FK_BookPdfFiles_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "Id",
@@ -679,6 +696,9 @@ namespace Bookistry.API.Persistences.Migrations
 
             migrationBuilder.DropTable(
                 name: "BookCoverImages");
+
+            migrationBuilder.DropTable(
+                name: "BookPdfFiles");
 
             migrationBuilder.DropTable(
                 name: "Favorites");

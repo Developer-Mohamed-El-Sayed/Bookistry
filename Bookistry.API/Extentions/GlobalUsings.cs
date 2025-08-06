@@ -43,3 +43,7 @@ global using Microsoft.AspNetCore.Authorization;
 global using Bookistry.API.Contracts.Books.Requests;
 global using Bookistry.API.Contracts.Categories.Requests;
 global using Bookistry.API.Contracts.Categories.Responses;
+global using Bookistry.API.Contracts.Reviews.Requests;
+global using Bookistry.API.Contracts.Reviews.Responses;
+
+

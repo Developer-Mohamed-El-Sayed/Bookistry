@@ -50,7 +50,7 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
             });
 
         builder
-            .OwnsOne(i => i.PdfFileUpload, img =>
+            .OwnsOne(i => i.CoverImageUpload, img =>
             {
                 img.ToTable("BookCoverImages");
                 img.WithOwner().HasForeignKey("BookId");

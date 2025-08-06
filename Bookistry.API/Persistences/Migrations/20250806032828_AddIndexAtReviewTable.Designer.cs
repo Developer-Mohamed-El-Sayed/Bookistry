@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookistry.API.Persistences.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250804125856_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250806032828_AddIndexAtReviewTable")]
+    partial class AddIndexAtReviewTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -504,8 +504,8 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<string>("ReviewerId")
                         .IsRequired()
@@ -519,11 +519,12 @@ namespace Bookistry.API.Persistences.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
-
                     b.HasIndex("ReviewerId");
 
                     b.HasIndex("UpdatedById");
+
+                    b.HasIndex("BookId", "ReviewerId")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });
@@ -743,23 +744,27 @@ namespace Bookistry.API.Persistences.Migrations
 
                             b1.Property<string>("ContentType")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
 
                             b1.Property<string>("FileExtension")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
 
                             b1.Property<string>("FileName")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
 
                             b1.Property<string>("StoredFileName")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasMaxLength(250)
+                                .HasColumnType("nvarchar(250)");
 
                             b1.HasKey("BookId");
 
-                            b1.ToTable("Books");
+                            b1.ToTable("BookCoverImages", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BookId");
@@ -792,7 +797,7 @@ namespace Bookistry.API.Persistences.Migrations
 
                             b1.HasKey("BookId");
 
-                            b1.ToTable("BookCoverImages", (string)null);
+                            b1.ToTable("BookPdfFiles", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BookId");

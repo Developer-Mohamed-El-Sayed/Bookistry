@@ -5,7 +5,7 @@ public record CreateBookRequest(
     string Description,
     bool IsVIP,
     int PageCount,
-    IEnumerable<string> CategoriesTitle,
+    IEnumerable<CategoryRequest> CategoryDetails,
     IFormFile CoverImage,
     IFormFile PdfFile
 );

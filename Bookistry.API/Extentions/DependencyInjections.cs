@@ -88,6 +88,7 @@ public static class DependencyInjections
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IReviewService, ReviewService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
         return services;
     }
