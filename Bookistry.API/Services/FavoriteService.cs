@@ -1,13 +1,14 @@
 ﻿namespace Bookistry.API.Services;
 
-public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteService> logger) : IFavoriteService
+public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteService> logger, IBookHelpers bookHelpers) : IFavoriteService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<FavoriteService> _logger = logger;
+    private readonly IBookHelpers _bookHelpers = bookHelpers;
 
     public async Task<Result> CreateAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
     {
-        var bookExists = await GetBookExistsAsync(bookId, cancellationToken);
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure(BookErrors.NotFound);
         var favoriteExists = await _context.Favorites
@@ -27,7 +28,7 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
 
     public async Task<Result> DeleteAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
     {
-        var bookExists = await GetBookExistsAsync(bookId, cancellationToken);
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure(BookErrors.NotFound);
         var favorite = await _context.Favorites
@@ -42,7 +43,7 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
     }
     public async Task<Result<bool>> IsFavoriteAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
     {
-        var bookExists = await GetBookExistsAsync(bookId, cancellationToken);
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure<bool>(BookErrors.NotFound);
         var isFavorite = await _context.Favorites
@@ -50,7 +51,4 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
 
         return Result.Success(isFavorite);
     }
-    private async Task<bool> GetBookExistsAsync(Guid bookId, CancellationToken cancellationToken) =>
-        await _context.Books
-            .AnyAsync(b => b.Id == bookId, cancellationToken);
 }

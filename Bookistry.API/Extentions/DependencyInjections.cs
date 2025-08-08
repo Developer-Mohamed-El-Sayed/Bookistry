@@ -1,4 +1,6 @@
-﻿namespace Bookistry.API.Extentions;
+﻿using Bookistry.API.Helpers;
+
+namespace Bookistry.API.Extentions;
 
 public static class DependencyInjections
 {
@@ -90,7 +92,9 @@ public static class DependencyInjections
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IReadingProgressService, ReadingProgressService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
+        services.AddScoped<IBookHelpers, BookHelpers>();
         return services;
     }
     private static IServiceCollection AddErrorHandling(this IServiceCollection services)

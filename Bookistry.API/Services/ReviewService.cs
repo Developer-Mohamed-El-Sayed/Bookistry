@@ -1,12 +1,13 @@
 ﻿namespace Bookistry.API.Services;
 
-public class ReviewService(ApplicationDbContext context) : IReviewService
+public class ReviewService(ApplicationDbContext context, IBookHelpers bookHelpers) : IReviewService
 {
     private readonly ApplicationDbContext _context = context;
+    private readonly IBookHelpers _bookHelpers = bookHelpers;
 
     public async Task<Result<ReviewResponse>> CreateAsync(Guid bookId, string userId, ReviewRequest request, CancellationToken cancellationToken = default)
     {
-        var bookExists = await GetBookExistsAsync(bookId, cancellationToken);
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure<ReviewResponse>(BookErrors.NotFound);
         var reviewExists = await _context.Reviews
@@ -23,7 +24,7 @@ public class ReviewService(ApplicationDbContext context) : IReviewService
 
     public async Task<Result<PaginatedList<ReviewResponse>>> GetCurrentReview(Guid bookId, RequestFilters filters, CancellationToken cancellationToken = default)
     {
-        var bookExists = await GetBookExistsAsync(bookId, cancellationToken);
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure<PaginatedList<ReviewResponse>>(BookErrors.NotFound);
         var reviewsQuery = _context.Reviews
@@ -37,9 +38,6 @@ public class ReviewService(ApplicationDbContext context) : IReviewService
         var paginatedReviews = await PaginatedList<ReviewResponse>.CreateAsync(reviewsQuery, filters.PageNumber, filters.PageSize, cancellationToken);
         return Result.Success(paginatedReviews);
     }
-    private async Task<bool> GetBookExistsAsync(Guid bookId, CancellationToken cancellationToken) =>
-         await _context.Books
-            .AnyAsync(b => b.Id == bookId, cancellationToken);
     
   
 }

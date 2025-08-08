@@ -19,6 +19,10 @@ public class MappingConfiguration : IRegister
 
         config.NewConfig<Review, ReviewResponse>()
             .Map(dest => dest.UserName, src => src.Reviewer.UserName);
+
+        config.NewConfig<ReadingProgress, ReadingProgressResponse>()
+            .Map(dest => dest.Title, src => src.Book.Title)
+            .Map(dest => dest.TotalPages, src => src.Book.PageCount);
     }
     private static string GetFirstName(string fullName)
     {

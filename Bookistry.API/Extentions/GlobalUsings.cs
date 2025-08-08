@@ -45,5 +45,8 @@ global using Bookistry.API.Contracts.Categories.Requests;
 global using Bookistry.API.Contracts.Categories.Responses;
 global using Bookistry.API.Contracts.Reviews.Requests;
 global using Bookistry.API.Contracts.Reviews.Responses;
+global using Bookistry.API.Contracts.BookReadingProgress.Requests;
+global using Bookistry.API.Contracts.BookReadingProgress.Responses;
+global using Bookistry.API.Helpers;
 
 
