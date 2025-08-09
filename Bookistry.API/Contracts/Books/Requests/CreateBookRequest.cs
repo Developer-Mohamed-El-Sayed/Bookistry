@@ -7,5 +7,6 @@ public record CreateBookRequest(
     int PageCount,
     IEnumerable<CategoryRequest> CategoryDetails,
     IFormFile CoverImage,
-    IFormFile PdfFile
+    IFormFile PdfFile,
+    string AuthorName
 );

@@ -7,18 +7,46 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.Title)
             .NotEmpty()
             .WithMessage("Title is required.")
-            .Length(3,200)
-            .WithMessage("Title must not exceed 200 characters.");
+            .Length(3, 200)
+            .WithMessage("Title must be between 3 and 200 characters.");
 
         RuleFor(x => x.Description)
             .NotEmpty()
             .WithMessage("Description is required.")
-            .Length(5,2000)
-            .WithMessage("Description must not exceed 2000 characters.");
+            .Length(5, 2000)
+            .WithMessage("Description must be between 5 and 2000 characters.");
 
         RuleFor(x => x.PageCount)
             .GreaterThan(0)
             .WithMessage("Page count must be greater than 0.");
-        //TODO: Implement the validation 
+
+        RuleFor(x => x.AuthorName)
+            .NotEmpty()
+            .WithMessage("Author name is required.")
+            .Length(3, 100)
+            .WithMessage("Author name must be between 3 and 100 characters.");
+
+        RuleFor(x => x.CategoryDetails)
+            .NotEmpty()
+            .WithMessage("At least one category is required.")
+            .Must(categories => categories.All(c => !string.IsNullOrWhiteSpace(c.Title)))
+            .WithMessage("Each category must have a title.");
+
+        RuleFor(x => x.CoverImage)
+            .NotNull()
+            .WithMessage("Cover image is required.")
+            .Must(file => file.Length > 0)
+            .WithMessage("Cover image must not be empty.")
+            .Must(file => new[] { ".jpg", ".jpeg", ".png" }
+            .Contains(Path.GetExtension(file.FileName).ToLower()))
+            .WithMessage("Cover image must be a JPG or PNG file.");
+
+        RuleFor(x => x.PdfFile)
+            .NotNull()
+            .WithMessage("PDF file is required.")
+            .Must(file => file.Length > 0)
+            .WithMessage("PDF file must not be empty.")
+            .Must(file => Path.GetExtension(file.FileName).ToLower() == ".pdf")
+            .WithMessage("File must be a PDF.");
     }
 }

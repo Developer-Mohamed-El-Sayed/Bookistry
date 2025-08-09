@@ -9,5 +9,5 @@ public record BookResponse(
     bool IsVIP,
     double AverageRating,
     int PageCount,
-    string AuthorFullName
+    string AuthorName
 );
