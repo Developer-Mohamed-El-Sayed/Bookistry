@@ -69,7 +69,7 @@ public class BookService(ApplicationDbContext context,
                     Name = categoryRequest.Title,
                     Description = categoryRequest.Description
                 };
-                _context.Categories.Add(categoryEntity);
+               await _context.Categories.AddAsync(categoryEntity,cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
@@ -84,7 +84,7 @@ public class BookService(ApplicationDbContext context,
         _logger.LogInformation("Saving book to database");
         try
         {
-            _context.Books.Add(book);
+           await _context.Books.AddAsync(book,cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Book saved to database successfully with Id: {BookId}", book.Id);
         }
