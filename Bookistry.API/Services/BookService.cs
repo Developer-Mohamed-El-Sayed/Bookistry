@@ -12,7 +12,7 @@ public class BookService(ApplicationDbContext context,
     private readonly string _filesPath = $"{webHostEnvironment.WebRootPath}/files";
     private readonly string _imagesPath = $"{webHostEnvironment.WebRootPath}/images";
 
-    public async Task<Result> CreateAsync(string authorId, CreateBookRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<BookResponse>> CreateAsync(string authorId, CreateBookRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting CreateAsync for authorId: {AuthorId}", authorId);
 
@@ -139,7 +139,22 @@ public class BookService(ApplicationDbContext context,
         }
 
         _logger.LogInformation("Book created successfully with Id: {BookId}", book.Id);
-        return Result.Success();
+       var response = await _context.Books
+            .Where(b => b.Id == book.Id && b.AuthorId == authorId)
+            .AsNoTracking()
+            .Select(b => new BookResponse(
+                b.Id,
+                b.Title,
+                b.Description,
+                $"{_imagesPath}/{b.CoverImageUpload.StoredFileName}",
+                b.PublishedOn,
+                b.IsVIP,
+                b.AverageRating,
+                b.PageCount,
+                $"{b.Author.FirstName} {b.Author.LastName}"
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
+        return Result.Success(response!);
     }
 
     public async Task<Result<PaginatedList<BookResponse>>> GetAllAsync(RequestFilters filters, CancellationToken cancellationToken = default)
@@ -158,4 +173,40 @@ public class BookService(ApplicationDbContext context,
         return Result.Success(response);
     }
 
+    public async Task<Result<BookDetailsResponse>> GetAsync(Guid bookId, CancellationToken cancellationToken = default)
+    {
+        var query = await _context.Books
+                   .Where(b => b.Id == bookId)
+                   .Select(b => new BookDetailsResponse(
+                       b.Id,
+                       b.Title,
+                       b.Description,
+                       $"{_imagesPath}/{b.CoverImageUpload.StoredFileName}",
+                       $"{_filesPath}/{b.PdfFileUpload.StoredFileName}",
+                       b.PublishedOn,
+                       b.IsVIP ? SubscriptionType.VIP : SubscriptionType.Free,
+                       b.Reviews.Any() ? b.Reviews.Average(r => r.Rating) : 0,
+                       b.ViewCount,
+                       b.DownloadCount,
+                       b.PageCount,
+                       b.Author.FirstName + " " + b.Author.LastName,
+                       b.BookCategories.Select(bc => new CategoryResponse(
+                           bc.Category.Id,
+                           bc.Category.Name,
+                           bc.Category.Description
+                       )),
+                       b.Reviews.Select(r => new ReviewResponse(
+                           r.Book.Author.UserName!,
+                           r.Rating,
+                           r.Comment,
+                           r.CreatedOn
+                       ))
+                   ))
+                   .FirstOrDefaultAsync(cancellationToken);
+
+        if (query is null)
+            return Result.Failure<BookDetailsResponse>(BookErrors.NotFound);
+        _logger.LogInformation("Retrieved book details for bookId: {BookId}", bookId);
+        return Result.Success(query);
+    }
 }

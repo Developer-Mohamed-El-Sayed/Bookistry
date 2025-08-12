@@ -48,5 +48,6 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
             .WithMessage("PDF file must not be empty.")
             .Must(file => Path.GetExtension(file.FileName).ToLower() == ".pdf")
             .WithMessage("File must be a PDF.");
+        // TODO add more Validations for other properties if needed
     }
 }

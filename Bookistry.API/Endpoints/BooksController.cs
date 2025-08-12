@@ -17,6 +17,13 @@ public class BooksController(IBookService bookService) : ControllerBase
     public async Task<IActionResult> Create([FromForm] CreateBookRequest request,CancellationToken cancellationToken)
     {
         var result = await _bookService.CreateAsync(User.GetUserId(),request,cancellationToken);
-        return result.IsSuccess ? Created() : result.ToProblem();
+        return result.IsSuccess ? CreatedAtAction(nameof(Get),new {result.Value.Id},result.Value) : result.ToProblem();
+    }
+    [HttpGet("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Get([FromRoute]Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _bookService.GetAsync(id, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 }
