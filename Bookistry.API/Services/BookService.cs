@@ -12,7 +12,7 @@ public class BookService(ApplicationDbContext context,
     private readonly string _filesPath = $"{webHostEnvironment.WebRootPath}/files";
     private readonly string _imagesPath = $"{webHostEnvironment.WebRootPath}/images";
 
-    public async Task<Result<BookResponse>> CreateAsync(string authorId, CreateBookRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result> CreateAsync(string authorId, CreateBookRequest request, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting CreateAsync for authorId: {AuthorId}", authorId);
 
@@ -22,18 +22,21 @@ public class BookService(ApplicationDbContext context,
         if (await _userManager.IsInRoleAsync(author, DefaultRoles.Author.Name) is false)
             return Result.Failure<BookResponse>(UserErrors.NotAuthor);
 
+        if (await _context.Books.AnyAsync(x => x.Title == request.Title, cancellationToken))
+            return Result.Failure<BookResponse>(BookErrors.DublicatedTitle);
+
         var randomFileName = Path.GetRandomFileName();
         var randomImageName = Path.GetRandomFileName();
+
         _logger.LogInformation("Generated file names: Pdf={PdfFile}, Image={ImageFile}", randomFileName, randomImageName);
 
         var book = new Book
         {
-            Id = Guid.CreateVersion7(),
             Title = request.Title,
             Description = request.Description,
             IsVIP = request.IsVIP,
             PageCount = request.PageCount,
-            AuthorId = authorId, // Critical: Set the AuthorId
+            AuthorId = authorId,
             CoverImageUpload = new UploadedFile
             {
                 FileName = request.CoverImage.FileName,
@@ -51,8 +54,10 @@ public class BookService(ApplicationDbContext context,
             BookCategories = []
         };
 
-       
         _logger.LogInformation("Processing {Count} categories", request.CategoryDetails.Count());
+
+        _context.Books.Add(book);
+
         foreach (var categoryRequest in request.CategoryDetails)
         {
             _logger.LogInformation("Processing category: {CategoryTitle}", categoryRequest.Title);
@@ -65,26 +70,27 @@ public class BookService(ApplicationDbContext context,
                 _logger.LogInformation("Category not found, creating new: {CategoryTitle}", categoryRequest.Title);
                 categoryEntity = new Category
                 {
-                    Id = Guid.CreateVersion7(),
                     Name = categoryRequest.Title,
                     Description = categoryRequest.Description
                 };
-               await _context.Categories.AddAsync(categoryEntity,cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
+
+                _context.Categories.Add(categoryEntity);
             }
 
-            book.BookCategories.Add(new BookCategory
+            var bookCategory = new BookCategory
             {
                 BookId = book.Id,
-                CategoryId = categoryEntity.Id
-            });
+                CategoryId = categoryEntity.Id,
+                Book = book,
+                Category = categoryEntity
+            };
+            _context.Set<BookCategory>().Add(bookCategory);
+            book.BookCategories.Add(bookCategory);
         }
 
-        
-        _logger.LogInformation("Saving book to database");
+        _logger.LogInformation("Saving book and related data to database");
         try
         {
-           await _context.Books.AddAsync(book,cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Book saved to database successfully with Id: {BookId}", book.Id);
         }
@@ -94,15 +100,10 @@ public class BookService(ApplicationDbContext context,
             return Result.Failure<BookResponse>(BookErrors.DatabaseSaveError);
         }
 
-        // Save files after successful database save
         try
         {
             var imagePath = Path.Combine(_imagesPath, randomImageName);
             var pdfPath = Path.Combine(_filesPath, randomFileName);
-
-            // Ensure directories exist
-            Directory.CreateDirectory(_imagesPath);
-            Directory.CreateDirectory(_filesPath);
 
             _logger.LogInformation("Saving image to: {ImagePath}", imagePath);
             _logger.LogInformation("Saving PDF to: {PdfPath}", pdfPath);
@@ -119,7 +120,6 @@ public class BookService(ApplicationDbContext context,
         {
             _logger.LogError(ex, "Error saving files for book {BookId}. Rolling back database changes.", book.Id);
 
-            // Rollback database changes
             try
             {
                 var bookToRemove = await _context.Books
@@ -137,14 +137,9 @@ public class BookService(ApplicationDbContext context,
 
             return Result.Failure<BookResponse>(BookErrors.FileSaveError);
         }
-        var savedBook = await _context.Books
-            .Include(b => b.Author)
-            .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category)
-            .FirstAsync(b => b.Id == book.Id, cancellationToken);
 
         _logger.LogInformation("Book created successfully with Id: {BookId}", book.Id);
-        return Result.Success(savedBook.Adapt<BookResponse>());
+        return Result.Success();
     }
 
     public async Task<Result<PaginatedList<BookResponse>>> GetAllAsync(RequestFilters filters, CancellationToken cancellationToken = default)
