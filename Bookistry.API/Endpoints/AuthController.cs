@@ -35,4 +35,5 @@ public class AuthController(IAuthService authServices) : ControllerBase
         var result = await _authServices.GenerateRefreshTokenAsync(request, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
+
 }
