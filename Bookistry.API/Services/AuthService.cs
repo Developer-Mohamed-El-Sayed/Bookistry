@@ -31,7 +31,7 @@ public class AuthService(
     }
     public async Task<Result<AuthResponse>> SignInAsync(SignInRequest request, CancellationToken cancellationToken = default)
     {
-        if(await _userManager.FindByEmailAsync(request.Email) is not { } user)
+        if(await _userManager.FindByEmailAsync(request.Email.ToLowerInvariant()) is not { } user)
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
         if (user.IsDisabled)
             return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
@@ -92,6 +92,52 @@ public class AuthService(
 
         return Result.Success(await GetAuthResponse(user));
     }
+    public async Task<Result> RevokeAsync(LogOutRequest request)
+    {
+        var userId = _jwtProvider.ValidateToken(request.Token);
+        if (userId is null)
+            return Result.Failure(UserErrors.InvalidToken);
+        if(await _userManager.FindByIdAsync(userId) is not { } user)
+            return Result.Failure(UserErrors.NotFound);
+
+        var refreshToken = user.RefreshTokens.SingleOrDefault(rt => rt.Token == request.RefreshToken);
+        if (refreshToken is null)
+            return Result.Failure(UserErrors.InvalidToken);
+        if (refreshToken.RevokedOn is not null)
+            return Result.Failure(UserErrors.RefreshTokenAlreadyRevoked);
+
+        if (refreshToken.ExpiresOn <= DateTime.UtcNow)
+            return Result.Failure(UserErrors.RefreshTokenExpired);
+
+        refreshToken.RevokedOn = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+        return Result.Success();
+    }
+
+    public async Task<Result<AuthResponse>> GenerateRefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
+    {
+        var userId = _jwtProvider.ValidateToken(request.Token);
+        if (userId is null)
+            return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
+        if(await _userManager.FindByIdAsync(userId) is not { } user)
+            return Result.Failure<AuthResponse>(UserErrors.NotFound);
+        if(user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.UserDisabled);
+
+        if (await _userManager.IsLockedOutAsync(user))
+            return Result.Failure<AuthResponse>(UserErrors.UserLockedOut);
+
+        var refreshToken = user.RefreshTokens.SingleOrDefault(rt => rt.Token == request.RefreshToken);
+        if (refreshToken is null)
+            return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
+        if (refreshToken.RevokedOn is not null)
+            return Result.Failure<AuthResponse>(UserErrors.RefreshTokenAlreadyRevoked);
+        if (refreshToken.ExpiresOn <= DateTime.UtcNow)
+            return Result.Failure<AuthResponse>(UserErrors.RefreshTokenExpired);
+        refreshToken.RevokedOn = DateTime.UtcNow;
+        var response = await GetAuthResponse(user);
+        return Result.Success(response);
+    }
     private async Task<IEnumerable<string>> GetRolesAsync(ApplicationUser user) => 
          await _userManager.GetRolesAsync(user);
     private static string GetFullName(string firstName, string lastName)
@@ -139,6 +185,5 @@ public class AuthService(
             return string.Empty;
         return email.Split('@')[0];
     }
-
 
 }

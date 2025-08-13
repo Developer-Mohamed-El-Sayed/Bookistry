@@ -19,6 +19,12 @@ public record UserErrors
     public static readonly Error NotFound =
         new("User.NotFound", "The specified user was not found.", StatusCodes.Status404NotFound);
     public static readonly Error NotAuthor = new("User.NotAuthor", "User is not an author",StatusCodes.Status401Unauthorized);
+    public static readonly Error InvalidToken =
+        new("User.InvalidToken", "The provided token is invalid or expired.", StatusCodes.Status401Unauthorized);
+    public static readonly Error RefreshTokenExpired =
+       new("User.RefreshTokenExpired", "The refresh token has expired.", StatusCodes.Status401Unauthorized);
+    public static readonly Error RefreshTokenAlreadyRevoked =
+        new("User.RefreshTokenAlreadyRevoked", "The refresh token has already been revoked.", StatusCodes.Status400BadRequest);
 
 
 }

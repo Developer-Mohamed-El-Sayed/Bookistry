@@ -23,4 +23,16 @@ public class AuthController(IAuthService authServices) : ControllerBase
         var result = await _authServices.SignInGoogleAsync(request);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogOut([FromBody] LogOutRequest request)
+    {
+        var result = await _authServices.RevokeAsync(request);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _authServices.GenerateRefreshTokenAsync(request, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
 }
