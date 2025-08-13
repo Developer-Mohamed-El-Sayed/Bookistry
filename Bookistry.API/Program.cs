@@ -29,4 +29,6 @@ app.MapHealthChecks("/status", new HealthCheckOptions
 
 app.MapControllers();
 
+app.MapStaticAssets();
+
 app.Run();

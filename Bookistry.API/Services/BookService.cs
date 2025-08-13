@@ -206,7 +206,66 @@ public class BookService(ApplicationDbContext context,
 
         if (query is null)
             return Result.Failure<BookDetailsResponse>(BookErrors.NotFound);
+        var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == bookId, cancellationToken);
+        if (book is not null)
+        {
+            book.ViewCount++;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
         _logger.LogInformation("Retrieved book details for bookId: {BookId}", bookId);
         return Result.Success(query);
     }
+    public async Task<Result<PdfDownloadResponse>> DownloadAsync(Guid bookId,string userId,CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Starting PDF download for bookId: {BookId} by userId: {UserId}", bookId, userId);
+
+        var book = await _context.Books
+            .Include(b => b.PdfFileUpload)
+            .FirstOrDefaultAsync(b => b.Id == bookId, cancellationToken);
+
+        if (book is null)
+        {
+            _logger.LogWarning("Book with Id {BookId} not found", bookId);
+            return Result.Failure<PdfDownloadResponse>(BookErrors.NotFound);
+        }
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Result.Failure<PdfDownloadResponse>(UserErrors.NotFound);
+
+        if (book.IsVIP && !user.IsVIP)
+        {
+            _logger.LogWarning("User {UserId} attempted to download VIP book {BookId} without VIP access", userId, bookId);
+            return Result.Failure<PdfDownloadResponse>(BookErrors.VipRequired);
+        }
+
+
+        var path = Path.Combine(_filesPath, book.PdfFileUpload.StoredFileName);
+
+        if (!File.Exists(path))
+        {
+            _logger.LogError("PDF file not found on disk for bookId: {BookId}, path: {Path}", bookId, path);
+            return Result.Failure<PdfDownloadResponse>(BookErrors.NotFound);
+        }
+
+        book.DownloadCount++;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        MemoryStream memoryStream = new();
+        await using (FileStream fileStream = new(path, FileMode.Open, FileAccess.Read))
+        {
+            await fileStream.CopyToAsync(memoryStream, cancellationToken);
+        }
+
+        memoryStream.Position = 0;
+
+        var response = new PdfDownloadResponse(
+            memoryStream.ToArray(),
+            book.PdfFileUpload.ContentType,
+            book.PdfFileUpload.FileName
+        );
+
+        _logger.LogInformation("PDF download completed successfully for bookId: {BookId} by userId: {UserId}", bookId, userId);
+        return Result.Success(response);
+    }
+
 }

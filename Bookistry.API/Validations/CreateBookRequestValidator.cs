@@ -33,21 +33,12 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
             .WithMessage("Each category must have a title.");
 
         RuleFor(x => x.CoverImage)
-            .NotNull()
-            .WithMessage("Cover image is required.")
-            .Must(file => file.Length > 0)
-            .WithMessage("Cover image must not be empty.")
-            .Must(file => new[] { ".jpg", ".jpeg", ".png" }
-            .Contains(Path.GetExtension(file.FileName).ToLower()))
-            .WithMessage("Cover image must be a JPG or PNG file.");
+            .SetValidator(new ImageSizeValidator())
+            .SetValidator(new ImageExtensionValidator());            
 
         RuleFor(x => x.PdfFile)
-            .NotNull()
-            .WithMessage("PDF file is required.")
-            .Must(file => file.Length > 0)
-            .WithMessage("PDF file must not be empty.")
-            .Must(file => Path.GetExtension(file.FileName).ToLower() == ".pdf")
-            .WithMessage("File must be a PDF.");
-        // TODO add more Validations for other properties if needed
+            .SetValidator(new FileSizeValidator())
+            .SetValidator(new FileExtenstionValidator());
+   
     }
 }

@@ -10,4 +10,6 @@ public record BookErrors
         new("Book.DatabaseSaveError","An error occurred while saving the book to the database",StatusCodes.Status400BadRequest);
     public static readonly Error DublicatedTitle =
         new("Book.DublicatedTitle", "This title is already exists.", StatusCodes.Status409Conflict);
+    public static readonly Error VipRequired =
+        new("Book.VipRequired", "VIP subscription is required to download this book.", StatusCodes.Status403Forbidden);
 }
