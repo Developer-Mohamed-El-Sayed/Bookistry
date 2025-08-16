@@ -53,8 +53,7 @@ public class CategoryService(ApplicationDbContext context, HybridCache hybridCac
       await _context.Categories
        .AsNoTracking()
        .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
-    // TODO : Implement DeleteAsync method if needed but currently not required and we use the soft delete approach
-    // TODO: Implement GetAllAsync method if needed but currently not required and we use the hybrid cache approach
-    //TODO: Implement the update method to update the category with the given id and request
-    // TODO: restore the category with the given id and request if needed admin can restore the category
+    // TODO: Implement DeleteAsync method - soft delete approach
+    // TODO: Implement GetAllAsync method - with hybrid cache
+    // TODO: Implement RestoreAsync method - admin restore functionality
 }

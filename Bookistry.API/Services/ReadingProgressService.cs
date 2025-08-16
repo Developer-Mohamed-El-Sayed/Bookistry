@@ -48,11 +48,9 @@ public class ReadingProgressService(
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
-    // TODO: Implement GetUserProgressListAsync
-    // - Return all reading progress records for a specific user.
-    // - If bookId is provided → return only that book’s progress.
-    // - If bookId is null → return progress list for all user’s books.
-    // - Include basic book info (e.g., Title, CoverImage) for display in UI.
-    // - Useful for "My Books" page, dashboard, or progress tracking features.
+    // TODO: GetUserProgressListAsync - all user progress records
+    // - Support bookId filter for specific book
+    // - Include book info for UI display
+    // - Support "My Books" dashboard features
 
 }

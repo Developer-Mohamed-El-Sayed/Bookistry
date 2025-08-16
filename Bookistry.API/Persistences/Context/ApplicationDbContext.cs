@@ -35,6 +35,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 entityEntry.Property(u => u.UpdatedById).CurrentValue = currentUserId;
                 entityEntry.Property(u => u.UpdatedOn).CurrentValue = DateTime.UtcNow;
             }
+            else if(entityEntry.State == EntityState.Deleted)
+            {
+                entityEntry.Property(x => x.DeletedById).CurrentValue = currentUserId;
+                entityEntry.Property(x => x.DeletedOn).CurrentValue = DateTime.UtcNow;
+            }
         }
 
         return base.SaveChangesAsync(cancellationToken);

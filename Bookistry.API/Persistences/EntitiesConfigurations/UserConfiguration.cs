@@ -12,7 +12,7 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(p => p.ProfileImageUrl)
+        builder.Property(p => p.ProfileAvatar)
             .HasMaxLength(300);
         builder
             .OwnsMany(r => r.RefreshTokens)

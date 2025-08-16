@@ -9,7 +9,7 @@ public sealed class Book : Auditable
     public UploadedFile PdfFileUpload { get; set; } = default!;
     public DateTime PublishedOn { get; set; } = DateTime.UtcNow;
     public bool IsVIP { get; set; }
-    public double AverageRating { get; set; } 
+    public double AverageRating { get; set; }
     public int ViewCount { get; set; }
     public int DownloadCount { get; set; }
     public int PageCount { get; set; }

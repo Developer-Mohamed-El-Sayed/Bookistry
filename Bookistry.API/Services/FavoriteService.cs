@@ -52,10 +52,6 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
         return Result.Success(isFavorite);
     }
 
-    // TODO: Implement GetUserFavoritesAsync(string userId)
-    //       - Retrieve all books that the user has added to favorites
-    //       - Return basic data only (BookId, Title, CoverImage)
-
-    // TODO: Implement CountUserFavoritesAsync(string userId)
-    //       - Return the total number of favorite books for the given user
+    // TODO: GetUserFavoritesAsync(string userId) - user's favorite books
+    // TODO: CountUserFavoritesAsync(string userId) - total favorite count
 }

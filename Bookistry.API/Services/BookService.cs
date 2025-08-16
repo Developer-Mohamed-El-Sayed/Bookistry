@@ -271,6 +271,7 @@ public class BookService(ApplicationDbContext context,
 
         book.DownloadCount++;
         await _context.SaveChangesAsync(cancellationToken);
+        await _hybridCache.RemoveAsync($"{_cachePrefix}:{bookId}", cancellationToken);
 
         MemoryStream memoryStream = new();
         await using (FileStream fileStream = new(path, FileMode.Open, FileAccess.Read))
@@ -384,6 +385,6 @@ public class BookService(ApplicationDbContext context,
         return Result.Success();
     }
 
-    //TODO: Implement DeleteAsync method if needed but currently not required and we use the soft delete approach
-    //TODO: Implement the restore method to restore the book with the given id and request if needed admin can restore the book
+    // TODO: Implement DeleteAsync method - soft delete approach
+    // TODO: Implement RestoreAsync method - admin restore functionality
 }

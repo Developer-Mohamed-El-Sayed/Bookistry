@@ -55,21 +55,8 @@ public class ReviewService(
         return Result.Success(paginatedReviews);
     }
 
-    // TODO: Add GetReviewByIdAsync(reviewId) 
-    // - Check if review exists
-    // - Return mapped response
-
-    // TODO: Add UpdateReviewAsync(reviewId, userId, request) 
-    // - Ensure review exists and belongs to user
-    // - Update comment/rating
-    // - Invalidate cache for book reviews
-
-    // TODO: Add DeleteReviewAsync(reviewId, userId) 
-    // - Ensure review exists and belongs to user
-    // - Delete review
-    // - Invalidate cache
-
-    // TODO: Add GetBookReviewStatsAsync(bookId) 
-    // - Return total reviews + average rating
-    // - Cache this for performance
+    // TODO: GetReviewByIdAsync(reviewId) - individual review retrieval
+    // TODO: UpdateReviewAsync(reviewId, userId, request) - review modification
+    // TODO: DeleteReviewAsync(reviewId, userId) - review removal
+    // TODO: GetBookReviewStatsAsync(bookId) - statistics and average rating
 }
