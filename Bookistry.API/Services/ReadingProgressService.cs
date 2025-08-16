@@ -1,9 +1,14 @@
 ﻿namespace Bookistry.API.Services;
 
-public class ReadingProgressService(ApplicationDbContext context, IBookHelpers bookHelpers) : IReadingProgressService
+public class ReadingProgressService(
+    ApplicationDbContext context,
+    IBookHelpers bookHelpers,
+    HybridCache hybridCache
+    ) : IReadingProgressService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IBookHelpers _bookHelpers = bookHelpers;
+    private readonly HybridCache _hybridCache = hybridCache;
 
     public async Task<Result<ReadingProgressResponse>> GetAsync(string userId, Guid bookId, CancellationToken cancellationToken = default)
     {
@@ -43,4 +48,11 @@ public class ReadingProgressService(ApplicationDbContext context, IBookHelpers b
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
+    // TODO: Implement GetUserProgressListAsync
+    // - Return all reading progress records for a specific user.
+    // - If bookId is provided → return only that book’s progress.
+    // - If bookId is null → return progress list for all user’s books.
+    // - Include basic book info (e.g., Title, CoverImage) for display in UI.
+    // - Useful for "My Books" page, dashboard, or progress tracking features.
+
 }

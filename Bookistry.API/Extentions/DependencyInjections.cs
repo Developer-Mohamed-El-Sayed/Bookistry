@@ -1,6 +1,4 @@
-﻿using Bookistry.API.Helpers;
-
-namespace Bookistry.API.Extentions;
+﻿namespace Bookistry.API.Extentions;
 
 public static class DependencyInjections
 {
@@ -14,6 +12,7 @@ public static class DependencyInjections
            .AddErrorHandling()
            .AddRegistrationConfig()
            .AddRateLimitConfig()
+           .AddCacheConfig()
            .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
@@ -163,5 +162,10 @@ public static class DependencyInjections
         string connectionString = configuration.GetConnectionString("DefaultConnection") ??
           throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         return connectionString;
+    }
+    private static IServiceCollection AddCacheConfig(this IServiceCollection services)
+    {
+        services.AddHybridCache();
+        return services;
     }
 }

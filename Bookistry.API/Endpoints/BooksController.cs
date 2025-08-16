@@ -34,4 +34,11 @@ public class BooksController(IBookService bookService) : ControllerBase
         return result.IsSuccess? File(result.Value.FileContent,result.Value.ContentType,result.Value.FileName) 
             : result.ToProblem();
     }
+    [HttpPut("{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromForm] UpdateBookRequest request,CancellationToken cancellationToken)
+    {
+        var result = await _bookService.UpdateAsync(User.GetUserId(),id,request,cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
 }
