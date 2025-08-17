@@ -35,9 +35,10 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
             .FirstOrDefaultAsync(x => x.BookId == bookId && x.UserId == userId, cancellationToken);
         if (favorite is null)
             return Result.Failure(FavoriteErrors.NotFound);
-        await _context.Favorites
-            .Where(f => f.BookId == bookId && f.UserId == userId)
-            .ExecuteDeleteAsync(cancellationToken);
+        favorite.IsDeleted = true;
+        favorite.DeletedOn = DateTime.UtcNow;
+        _context.Update(favorite);
+        await _context.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("User {UserId} unfavorited book {BookId} successfully", userId, bookId);
         return Result.Success();
     }
@@ -47,7 +48,7 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
         if (!bookExists)
             return Result.Failure<bool>(BookErrors.NotFound);
         var isFavorite = await _context.Favorites
-            .AnyAsync(x => x.BookId == bookId && x.UserId == userId, cancellationToken);
+            .AnyAsync(x => x.BookId == bookId && x.UserId == userId && !x.IsDeleted, cancellationToken);
 
         return Result.Success(isFavorite);
     }

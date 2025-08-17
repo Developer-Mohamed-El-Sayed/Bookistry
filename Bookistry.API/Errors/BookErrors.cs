@@ -12,4 +12,6 @@ public record BookErrors
         new("Book.DublicatedTitle", "This title is already exists.", StatusCodes.Status409Conflict);
     public static readonly Error VipRequired =
         new("Book.VipRequired", "VIP subscription is required to download this book.", StatusCodes.Status403Forbidden);
+    public static readonly Error AlreadyDeleted =
+        new("Book.AlreadyDeleted", "This book has already been deleted.", StatusCodes.Status400BadRequest);
 }

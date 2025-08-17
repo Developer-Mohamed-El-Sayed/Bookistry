@@ -6,6 +6,6 @@ public class BookHelpers(ApplicationDbContext context) : IBookHelpers
 
     public async Task<bool> GetBookExistsAsync(Guid bookId, CancellationToken cancellationToken = default) => 
         await _context.Books
-            .AnyAsync(b => b.Id == bookId, cancellationToken);
+            .AnyAsync(b => b.Id == bookId && !b.IsDeleted, cancellationToken);
 
 }

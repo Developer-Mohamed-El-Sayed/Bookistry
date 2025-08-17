@@ -2,7 +2,7 @@
 
 public static class DefaultRoles
 {
-    public partial class Author
+    public partial class Author // change this to admin if you want to use it as an admin role at production 
     {
         public const string Name = nameof(Author);
         public const string Id = "868826A7-5589-4BF0-82DA-5E04408ADC8F";

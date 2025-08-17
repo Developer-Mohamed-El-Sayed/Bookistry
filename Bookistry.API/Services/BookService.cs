@@ -55,6 +55,8 @@ public class BookService(ApplicationDbContext context,
             },
             BookCategories = []
         };
+        if(book.IsDeleted)
+            return Result.Failure<BookResponse>(BookErrors.AlreadyDeleted);
 
         _logger.LogInformation("Processing {Count} categories", request.CategoryDetails.Count());
 
@@ -142,45 +144,39 @@ public class BookService(ApplicationDbContext context,
         }
 
         _logger.LogInformation("Book created successfully with Id: {BookId}", book.Id);
-       var response = await _context.Books
-            .Where(b => b.Id == book.Id && b.AuthorId == authorId)
-            .AsNoTracking()
-            .Select(b => new BookResponse(
-                b.Id,
-                b.Title,
-                b.Description,
-                $"{_imagesPath}/{b.CoverImageUpload.StoredFileName}",
-                b.PublishedOn,
-                b.IsVIP,
-                b.AverageRating,
-                b.PageCount,
-                $"{b.Author.FirstName} {b.Author.LastName}"
-            ))
-            .FirstOrDefaultAsync(cancellationToken);
+        var response = await _context.Books
+             .Where(b => b.Id == book.Id && b.AuthorId == authorId)
+             .AsNoTracking()
+             .Select(b => new BookResponse(
+                 b.Id,
+                 b.Title,
+                 b.Description,
+                 $"{_imagesPath}/{b.CoverImageUpload.StoredFileName}",
+                 b.PublishedOn,
+                 b.IsVIP,
+                 b.AverageRating,
+                 b.PageCount,
+                 $"{b.Author.FirstName} {b.Author.LastName}"
+             ))
+             .FirstOrDefaultAsync(cancellationToken);
         return Result.Success(response!);
     }
 
     public async Task<Result<PaginatedList<BookResponse>>> GetAllAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"{_cachePrefix}:page={filters.PageNumber}:size={filters.PageSize}:search={filters.SearchTerm}:filter={filters.FilterBy}";
-        _logger.LogInformation("Retrieving books with cache key: {CacheKey}", cacheKey);
-        var response = await _hybridCache.GetOrCreateAsync(cacheKey, async entry =>
-        {
+        var query = _context.Set<Book>()
+            .Include(x => x.Author)
+            .Where(x =>
+                (string.IsNullOrEmpty(filters.SearchTerm) || x.Title.Contains(filters.SearchTerm)) &&
+                (string.IsNullOrEmpty(filters.FilterBy) ||
+                (filters.FilterBy == SubscriptionType.VIP && x.IsVIP) ||
+                (filters.FilterBy == SubscriptionType.Free && !x.IsVIP))
+                && !x.IsDeleted
+            )
+            .ProjectToType<BookResponse>()
+            .AsNoTracking();
 
-            var query = _context.Set<Book>()
-                .Include(x => x.Author)
-                .Where(x =>
-                    (string.IsNullOrEmpty(filters.SearchTerm) || x.Title.Contains(filters.SearchTerm)) &&
-                    (string.IsNullOrEmpty(filters.FilterBy) ||
-                    (filters.FilterBy == SubscriptionType.VIP && x.IsVIP) ||
-                    (filters.FilterBy == SubscriptionType.Free && !x.IsVIP)))
-                .ProjectToType<BookResponse>()
-                .AsNoTracking();
-
-            return await PaginatedList<BookResponse>.CreateAsync(query, filters.PageNumber, filters.PageSize, cancellationToken);
-
-        }, cancellationToken: cancellationToken);
-
+        var response = await PaginatedList<BookResponse>.CreateAsync(query, filters.PageNumber, filters.PageSize, cancellationToken);
         return Result.Success(response);
     }
 
@@ -191,7 +187,7 @@ public class BookService(ApplicationDbContext context,
         var query = await _hybridCache.GetOrCreateAsync(cacheKey, async data =>
         {
             return await _context.Books
-                   .Where(b => b.Id == bookId)
+                   .Where(b => b.Id == bookId&& !b.IsDeleted)
                    .Select(b => new BookDetailsResponse(
                        b.Id,
                        b.Title,
@@ -218,7 +214,7 @@ public class BookService(ApplicationDbContext context,
                        ))
                    ))
                    .FirstOrDefaultAsync(cancellationToken);
-        },cancellationToken: cancellationToken);
+        }, cancellationToken: cancellationToken);
 
 
         if (query is null)
@@ -237,13 +233,13 @@ public class BookService(ApplicationDbContext context,
 
         return Result.Success(query);
     }
-    public async Task<Result<PdfDownloadResponse>> DownloadAsync(Guid bookId,string userId,CancellationToken cancellationToken = default)
+    public async Task<Result<PdfDownloadResponse>> DownloadAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting PDF download for bookId: {BookId} by userId: {UserId}", bookId, userId);
 
         var book = await _context.Books
             .Include(b => b.PdfFileUpload)
-            .FirstOrDefaultAsync(b => b.Id == bookId, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == bookId && !b.IsDeleted, cancellationToken);
 
         if (book is null)
         {
@@ -290,15 +286,15 @@ public class BookService(ApplicationDbContext context,
         _logger.LogInformation("PDF download completed successfully for bookId: {BookId} by userId: {UserId}", bookId, userId);
         return Result.Success(response);
     }
-    public async Task<Result> UpdateAsync(string authorId,Guid id,UpdateBookRequest request, CancellationToken cancellationToken= default)
+    public async Task<Result> UpdateAsync(string authorId, Guid id, UpdateBookRequest request, CancellationToken cancellationToken = default)
     {
         var titleExists = await _context.Books
             .AnyAsync(x => x.Title == request.Title && x.Id != id, cancellationToken);
         if (titleExists)
             return Result.Failure(BookErrors.DublicatedTitle);
         var book = await _context.Books
-            .SingleOrDefaultAsync(x => x.Id.Equals(id),cancellationToken); // ==
-        if(book is null)
+            .SingleOrDefaultAsync(x => x.Id.Equals(id)&&!x.IsDeleted, cancellationToken); 
+        if (book is null)
             return Result.Failure(BookErrors.NotFound);
         if (await _userManager.FindByIdAsync(authorId) is not { } author)
             return Result.Failure(UserErrors.NotFound);
@@ -311,7 +307,7 @@ public class BookService(ApplicationDbContext context,
         {
             var categoryItems = await _context.Categories
                 .SingleOrDefaultAsync(x => x.Name == items.Title, cancellationToken);
-            if(categoryItems is null)
+            if (categoryItems is null)
             {
                 categoryItems = new Category
                 {
@@ -339,7 +335,7 @@ public class BookService(ApplicationDbContext context,
         if (request.CoverImage is not null)
         {
             var oldImagePath = Path.Combine(_imagesPath, book.CoverImageUpload.StoredFileName);
-            if(File.Exists(oldImagePath))
+            if (File.Exists(oldImagePath))
             {
                 _logger.LogInformation("Deleting old cover image at {ImagePath}", oldImagePath);
                 File.Delete(oldImagePath);
@@ -357,10 +353,10 @@ public class BookService(ApplicationDbContext context,
                 ContentType = request.CoverImage.ContentType
             };
         }
-        if(request.PdfFile is not null)
+        if (request.PdfFile is not null)
         {
             var oldPdfPath = Path.Combine(_filesPath, book.PdfFileUpload.StoredFileName);
-            if(File.Exists(oldPdfPath))
+            if (File.Exists(oldPdfPath))
             {
                 _logger.LogInformation("Deleting old PDF at {PdfPath}", oldPdfPath);
                 File.Delete(oldPdfPath);
@@ -385,6 +381,53 @@ public class BookService(ApplicationDbContext context,
         return Result.Success();
     }
 
-    // TODO: Implement DeleteAsync method - soft delete approach
-    // TODO: Implement RestoreAsync method - admin restore functionality
+    public async Task<Result> DeleteAsync(string authorId, Guid id, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Starting DeleteAsync for bookId: {BookId} by authorId: {AuthorId}", id, authorId);
+        var book = await _context.Books
+            .Include(b => b.Author)
+            .SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
+        if (book is null)
+        {
+            _logger.LogWarning("Book with Id {BookId} not found", id);
+            return Result.Failure(BookErrors.NotFound);
+        }
+        if (book.AuthorId != authorId)
+        {
+            _logger.LogWarning("Author {AuthorId} is not authorized to delete book {BookId}", authorId, id);
+            return Result.Failure(UserErrors.NotAuthor);
+        }
+        if (book.IsDeleted)
+        {
+            _logger.LogWarning("Book with Id {BookId} is already deleted", id);
+            return Result.Failure(BookErrors.AlreadyDeleted);
+        }
+        await SetBookDeletedStateAsync(book, true, cancellationToken);
+        _logger.LogInformation("Book with Id {BookId} deleted successfully", id);
+        return Result.Success();
+    }
+    public async Task<Result> RestoreAsync(string authorId,Guid id, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Starting RestoreAsync for bookId: {BookId}", id);
+        var book = await _context.Books
+            .SingleOrDefaultAsync(b => b.Id == id && b.IsDeleted, cancellationToken);
+        if (book is null)
+            return Result.Failure(BookErrors.NotFound);
+        if (book.AuthorId != authorId)
+            return Result.Failure(UserErrors.NotAuthor);
+        await SetBookDeletedStateAsync(book, false, cancellationToken);
+        _logger.LogInformation("Book with Id {BookId} restored successfully", id);
+        return Result.Success();
+
+    }
+    private async Task SetBookDeletedStateAsync(Book book, bool isDeleted, CancellationToken cancellationToken)
+    {
+        book.IsDeleted = isDeleted;
+        book.DeletedOn = isDeleted ? DateTime.UtcNow : null;
+
+        _context.Books.Update(book);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        await _hybridCache.RemoveAsync($"{_cachePrefix}:{book.Id}", cancellationToken);
+    }
 }

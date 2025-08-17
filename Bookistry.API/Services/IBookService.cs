@@ -7,4 +7,6 @@ public interface IBookService
     Task<Result<BookDetailsResponse>> GetAsync(Guid bookId, CancellationToken cancellationToken = default);
     Task<Result<PdfDownloadResponse>> DownloadAsync(Guid bookId, string userId, CancellationToken cancellationToken = default);
     Task<Result> UpdateAsync(string authorId,Guid id, UpdateBookRequest request, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(string authorId, Guid id, CancellationToken cancellationToken = default);
+    Task<Result> RestoreAsync(string authorId,Guid id, CancellationToken cancellationToken = default);
 }

@@ -7,7 +7,6 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration);
 });
 
-//TODO: Implement the hybird cache for service.
 
 var app = builder.Build();
 

@@ -41,4 +41,18 @@ public class BooksController(IBookService bookService) : ControllerBase
         var result = await _bookService.UpdateAsync(User.GetUserId(),id,request,cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
+    [HttpDelete("{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _bookService.DeleteAsync(User.GetUserId(),id,cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+    [HttpPut("restore/{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _bookService.RestoreAsync(User.GetUserId(),id,cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
 }

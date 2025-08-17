@@ -34,25 +34,22 @@ public class ReviewService(
         var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure<PaginatedList<ReviewResponse>>(BookErrors.NotFound);
-        var cacheKey = $"{_cachePrefixKey}{bookId}:{filters.PageNumber}:{filters.PageSize}";
-        var paginatedReviews = await _hybridCache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var query = _context.Reviews
-                .AsNoTracking()
-                .Where(r => r.BookId == bookId &&
-                    (string.IsNullOrEmpty(filters.SearchTerm) ||
-                     r.Comment.Contains(filters.SearchTerm) ||
-                     r.Reviewer.UserName!.Contains(filters.SearchTerm)))
-                .ProjectToType<ReviewResponse>();
 
-            return await PaginatedList<ReviewResponse>.CreateAsync(
-                query,
-                filters.PageNumber,
-                filters.PageSize,
-                cancellationToken);
-        }, cancellationToken: cancellationToken);
+        var query = _context.Reviews
+            .AsNoTracking()
+            .Where(r => r.BookId == bookId &&
+                (string.IsNullOrEmpty(filters.SearchTerm) ||
+                 r.Comment.Contains(filters.SearchTerm) ||
+                 r.Reviewer.UserName!.Contains(filters.SearchTerm)))
+            .ProjectToType<ReviewResponse>();
 
-        return Result.Success(paginatedReviews);
+        var response = await PaginatedList<ReviewResponse>.CreateAsync(
+            query,
+            filters.PageNumber,
+            filters.PageSize,
+            cancellationToken);
+
+        return Result.Success(response);
     }
 
     // TODO: GetReviewByIdAsync(reviewId) - individual review retrieval

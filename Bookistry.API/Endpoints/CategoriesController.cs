@@ -26,4 +26,25 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         var result = await _categoryService.UpdateAsync(id, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
+    [HttpDelete("{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _categoryService.DeleteAsync(id, cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+    [HttpPut("restore/{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _categoryService.RestoreAsync(id, cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await _categoryService.GetAllAsync(cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
 }
