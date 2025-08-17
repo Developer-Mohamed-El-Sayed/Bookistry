@@ -10,11 +10,20 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var app = builder.Build();
 
+if(app.Environment.IsDevelopment())
+{
+    app.MapSwagger();
+    app.UseSwaggerUI();
+}
+
+
 app.UseExceptionHandler();
 
-app.UseSerilogRequestLogging();
-
 app.UseHttpsRedirection();
+
+app.MapStaticAssets();
+
+app.UseSerilogRequestLogging();
 
 app.UseCors();
 
@@ -31,7 +40,5 @@ app.MapHealthChecks("/status", new HealthCheckOptions
 });
 
 app.MapControllers();
-
-app.MapStaticAssets();
 
 app.Run();

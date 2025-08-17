@@ -13,6 +13,7 @@ public static class DependencyInjections
            .AddRegistrationConfig()
            .AddRateLimitConfig()
            .AddCacheConfig()
+           .AddSwaggerConfig()
            .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
@@ -102,7 +103,7 @@ public static class DependencyInjections
         services.AddProblemDetails();
         return services;
     }
-    private static IServiceCollection AddHealthCheckConfig(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddHealthCheckConfig(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = GetConnectionString(configuration);
         services.AddHealthChecks()
@@ -110,7 +111,7 @@ public static class DependencyInjections
                 connectionString: connectionString,
                 name: "BookistryDB",
                 failureStatus: HealthStatus.Unhealthy,
-                tags: ["SQL","DB"]
+                tags: ["SQL", "DB"]
             );
         return services;
     }
@@ -121,11 +122,11 @@ public static class DependencyInjections
             rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             rateLimiterOptions.AddTokenBucketLimiter(RateLimit.TokenLimit, options =>
             {
-                options.TokenLimit = 50; 
+                options.TokenLimit = 50;
                 options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 options.QueueLimit = 5;
                 options.AutoReplenishment = true;
-                options.TokensPerPeriod = 5; 
+                options.TokensPerPeriod = 5;
                 options.ReplenishmentPeriod = TimeSpan.FromSeconds(1);
             });
 
@@ -134,7 +135,7 @@ public static class DependencyInjections
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit = 30, 
+                        PermitLimit = 30,
                         Window = TimeSpan.FromSeconds(10),
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 5,
@@ -145,7 +146,7 @@ public static class DependencyInjections
         });
         return services;
     }
-    private static IServiceCollection AddCORSConfig(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddCORSConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCors(option =>
             option.AddDefaultPolicy(
@@ -166,6 +167,12 @@ public static class DependencyInjections
     private static IServiceCollection AddCacheConfig(this IServiceCollection services)
     {
         services.AddHybridCache();
+        return services;
+    }
+    private static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
         return services;
     }
 }
