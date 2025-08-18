@@ -172,7 +172,48 @@ public static class DependencyInjections
     private static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Bookistry API",
+                Description = "API for Bookistry, a book management system.",
+                Contact = new OpenApiContact
+                {
+                    Name = "Dev Mohamed El Sayed",
+                    Email = "div.mohamed.elsayed1@gmail.com"
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "MIT License",
+                    Url = new Uri("https://opensource.org/license/mit/")
+                }
+            });
+
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please insert JWT with Bearer into field",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = JwtBearerDefaults.AuthenticationScheme
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = JwtBearerDefaults.AuthenticationScheme
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
         return services;
     }
 }

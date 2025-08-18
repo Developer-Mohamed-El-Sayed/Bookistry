@@ -51,7 +51,7 @@ global using Bookistry.API.Helpers;
 global using Bookistry.API.Validations.Common;
 global using static Bookistry.API.Settings.FileSettings;
 global using Microsoft.Extensions.Caching.Hybrid;
-
+global using Microsoft.OpenApi.Models;
 
 
 
