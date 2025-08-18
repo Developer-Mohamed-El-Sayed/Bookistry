@@ -30,5 +30,17 @@ public class ReviewsController(IReviewService reviewService) : ControllerBase
         var result = await _reviewService.UpdateAsync(bookId,id,request,cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid bookId,Guid id,CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.DeleteAsync(bookId, id, cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+    [HttpPut("restore/{id}")] //TODO: apply the role when delete and restore.
+    public async Task<IActionResult> Restore([FromRoute] Guid bookId, Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.RestoreAsync(bookId, id, cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
 
 }

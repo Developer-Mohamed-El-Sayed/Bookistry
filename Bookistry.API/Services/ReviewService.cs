@@ -51,7 +51,7 @@ public class ReviewService(
         var query = await _context.Reviews
             .AsNoTracking()
             .Include(x => x.Reviewer)
-            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId) && !x.IsDeleted, cancellationToken);
         if (query is null)
             return Result.Failure<ReviewResponse>(ReviewErrors.NotFound);
 
@@ -61,7 +61,7 @@ public class ReviewService(
     public async Task<Result> UpdateAsync(Guid bookId,Guid id, ReviewRequest request,CancellationToken cancellationToken = default)
     {
         var query = await _context.Reviews
-            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId) && !x.IsDeleted, cancellationToken);
         if(query is null)
             return Result.Failure(ReviewErrors.NotFound);
         await _context.Reviews
@@ -73,6 +73,32 @@ public class ReviewService(
             );
         return Result.Success();
     }
-    // TODO: DeleteReviewAsync(reviewId, userId) - review removal
+    public async Task<Result> DeleteAsync(Guid bookId,Guid id,CancellationToken cancellationToken = default)
+    {
+        var review = await _context.Reviews
+          .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+        if (review is null)
+            return Result.Failure(ReviewErrors.NotFound);
+        if (review.IsDeleted)
+            return Result.Failure(ReviewErrors.AlreadyDeleted);
+        await SetReviewDeleteAsync(review,true,cancellationToken);
+        return Result.Success();
+    }
+    public async Task<Result> RestoreAsync(Guid bookId, Guid id, CancellationToken cancellationToken = default)
+    {
+        var review = await _context.Reviews
+          .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+        if (review is null)
+            return Result.Failure(ReviewErrors.NotFound);
+        await SetReviewDeleteAsync(review, false, cancellationToken);
+        return Result.Success();
+    }
+    private async Task SetReviewDeleteAsync(Review review,bool isDelete,CancellationToken cancellationToken = default)
+    {
+        review.IsDeleted = isDelete;
+        review.DeletedOn = isDelete ? DateTime.UtcNow : null;
+        _context.Update(review);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
     // TODO: GetBookReviewStatsAsync(bookId) - statistics and average rating
 }

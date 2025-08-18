@@ -18,7 +18,8 @@ public record UserErrors
         new("Auth.UserCreationFailed", "Unable to create the user account due to a processing error.", StatusCodes.Status422UnprocessableEntity);
     public static readonly Error NotFound =
         new("User.NotFound", "The specified user was not found.", StatusCodes.Status404NotFound);
-    public static readonly Error NotAuthor = new("User.NotAuthor", "User is not an author",StatusCodes.Status401Unauthorized);
+    public static readonly Error NotAuthor =
+        new("User.NotAuthor", "User is not an author",StatusCodes.Status401Unauthorized);
     public static readonly Error InvalidToken =
         new("User.InvalidToken", "The provided token is invalid or expired.", StatusCodes.Status401Unauthorized);
     public static readonly Error RefreshTokenExpired =

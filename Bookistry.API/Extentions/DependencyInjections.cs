@@ -171,6 +171,7 @@ public static class DependencyInjections
     }
     private static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
+        // fix the Implementation 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
@@ -180,7 +181,7 @@ public static class DependencyInjections
                 Description = "API for Bookistry, a book management system.",
                 Contact = new OpenApiContact
                 {
-                    Name = "Dev Mohamed El Sayed",
+                    Name = "Backend Developer Mohamed El Sayed.",
                     Email = "div.mohamed.elsayed1@gmail.com"
                 },
                 License = new OpenApiLicense
