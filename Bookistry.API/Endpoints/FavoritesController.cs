@@ -17,10 +17,17 @@ public class FavoritesController(IFavoriteService favoriteService) : ControllerB
         var result = await _favoriteService.DeleteAsync(bookId, User.GetUserId(), cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
-    [HttpGet]
+    [HttpGet("check")]
     public async Task<IActionResult> IsFavorite([FromRoute] Guid bookId, CancellationToken cancellationToken)
     {
-        var result = await _favoriteService.IsFavoriteAsync(bookId, User.GetUserId(), cancellationToken);
+        var result = await _favoriteService.IsFavoriteAsync(bookId, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
+    [HttpGet]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> GetUserFavorite([FromRoute] Guid bookId, CancellationToken cancellationToken)
+    {
+        var result = await _favoriteService.GetUserFavoriteAsync(User.GetUserId(), bookId, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 }

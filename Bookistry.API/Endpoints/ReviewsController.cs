@@ -17,4 +17,18 @@ public class ReviewsController(IReviewService reviewService) : ControllerBase
         var result = await _reviewService.GetCurrentReview(bookId, filters, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
+    [HttpGet("{id}")]
+    [Authorize(Roles = DefaultRoles.Author.Name)]
+    public async Task<IActionResult> Get([FromRoute] Guid bookId, [FromRoute] Guid id,CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.GetAsync(bookId, id, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update([FromRoute] Guid bookId, [FromRoute] Guid id, [FromBody] ReviewRequest request,CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.UpdateAsync(bookId,id,request,cancellationToken);
+        return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+
 }

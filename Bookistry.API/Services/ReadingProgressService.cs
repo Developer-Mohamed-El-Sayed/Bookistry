@@ -3,20 +3,26 @@
 public class ReadingProgressService(
     ApplicationDbContext context,
     IBookHelpers bookHelpers,
-    HybridCache hybridCache
+    IWebHostEnvironment webHostEnvironment
     ) : IReadingProgressService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IBookHelpers _bookHelpers = bookHelpers;
-    private readonly HybridCache _hybridCache = hybridCache;
-
+    private readonly string _imagesPath = $"{webHostEnvironment.WebRootPath}/images";
     public async Task<Result<ReadingProgressResponse>> GetAsync(string userId, Guid bookId, CancellationToken cancellationToken = default)
     {
         var readingProgress = await _context.ReadingProgresses
                 .AsNoTracking()
                 .Include(x => x.Book)
                 .Where(x => x.BookId == bookId && x.UserId == userId)
-                .ProjectToType<ReadingProgressResponse>()
+                .Select(x => new ReadingProgressResponse(
+                    x.Book.Title,
+                    x.CurrentPage,
+                    x.Book.PageCount,
+                    $"{_imagesPath}/{x.Book.CoverImageUpload.StoredFileName}",
+                    x.Book.PageCount > 0 ? (double)x.CurrentPage / x.Book.PageCount * 100 : 0,
+                    x.LastReadAt
+                ))
                 .FirstOrDefaultAsync(cancellationToken);
 
         if (readingProgress is null)
@@ -48,9 +54,6 @@ public class ReadingProgressService(
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
-    // TODO: GetUserProgressListAsync - all user progress records
-    // - Support bookId filter for specific book
-    // - Include book info for UI display
-    // - Support "My Books" dashboard features
+
 
 }

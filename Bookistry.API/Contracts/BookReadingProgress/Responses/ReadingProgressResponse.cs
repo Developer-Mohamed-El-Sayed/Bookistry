@@ -4,5 +4,7 @@ public record ReadingProgressResponse(
     string Title,
     int CurrentPage,
     int TotalPages,
+    string CoverUrl,
+    double ProgressPercentage,
     DateTime LastReadAt
 );

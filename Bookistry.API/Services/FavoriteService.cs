@@ -1,10 +1,15 @@
 ﻿namespace Bookistry.API.Services;
 
-public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteService> logger, IBookHelpers bookHelpers) : IFavoriteService
+public class FavoriteService(ApplicationDbContext context,
+    ILogger<FavoriteService> logger,
+    IBookHelpers bookHelpers,
+    IWebHostEnvironment webHostEnvironment
+    ) : IFavoriteService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<FavoriteService> _logger = logger;
     private readonly IBookHelpers _bookHelpers = bookHelpers;
+    private readonly string _imagePath = $"{webHostEnvironment.WebRootPath}/images";
 
     public async Task<Result> CreateAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
     {
@@ -42,17 +47,32 @@ public class FavoriteService(ApplicationDbContext context, ILogger<FavoriteServi
         _logger.LogInformation("User {UserId} unfavorited book {BookId} successfully", userId, bookId);
         return Result.Success();
     }
-    public async Task<Result<bool>> IsFavoriteAsync(Guid bookId, string userId, CancellationToken cancellationToken = default)
+    public async Task<Result<bool>> IsFavoriteAsync(Guid bookId, CancellationToken cancellationToken = default)
     {
         var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
         if (!bookExists)
             return Result.Failure<bool>(BookErrors.NotFound);
         var isFavorite = await _context.Favorites
-            .AnyAsync(x => x.BookId == bookId && x.UserId == userId && !x.IsDeleted, cancellationToken);
+            .AnyAsync(x => x.BookId == bookId && !x.IsDeleted, cancellationToken);
 
         return Result.Success(isFavorite);
     }
+    public async Task<Result<UserFavoriteResponse>> GetUserFavoriteAsync(string userId,Guid bookId,CancellationToken cancellationToken = default)
+    {
+        var favorites = await _context.Favorites
+            .Where(f => f.UserId == userId && f.BookId == bookId && !f.IsDeleted)
+            .AsNoTracking()
+            .Select(f => new UserFavoriteResponse(
+                f.Book.Title,
+                f.User.UserName!,
+                $"{_imagePath}/{f.Book.CoverImageUpload.StoredFileName}"
+                , f.CreatedOn
+            ))
+            .SingleOrDefaultAsync(cancellationToken);
+        if (!(favorites is not null))
+            return Result.Failure<UserFavoriteResponse>(FavoriteErrors.NotFound);
+        _logger.LogInformation("User {UserId} favorite books", userId);
+        return Result.Success(favorites);
+    }
 
-    // TODO: GetUserFavoritesAsync(string userId) - user's favorite books
-    // TODO: CountUserFavoritesAsync(string userId) - total favorite count
 }

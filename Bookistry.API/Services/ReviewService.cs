@@ -2,15 +2,11 @@
 
 public class ReviewService(
     ApplicationDbContext context,
-    IBookHelpers bookHelpers,
-    HybridCache hybridCache
+    IBookHelpers bookHelpers
     ) : IReviewService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IBookHelpers _bookHelpers = bookHelpers;
-    private readonly HybridCache _hybridCache = hybridCache;
-    private const string _cachePrefixKey = "reviews:";
-
     public async Task<Result<ReviewResponse>> CreateAsync(Guid bookId, string userId, ReviewRequest request, CancellationToken cancellationToken = default)
     {
         var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
@@ -25,7 +21,6 @@ public class ReviewService(
         review.ReviewerId = userId;
         await _context.Reviews.AddAsync(review, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-        await _hybridCache.RemoveAsync($"{_cachePrefixKey}{bookId}", cancellationToken);
         return Result.Success(review.Adapt<ReviewResponse>());
     }
 
@@ -51,9 +46,33 @@ public class ReviewService(
 
         return Result.Success(response);
     }
+    public async Task<Result<ReviewResponse>> GetAsync(Guid bookId, Guid id,CancellationToken cancellationToken = default)
+    {
+        var query = await _context.Reviews
+            .AsNoTracking()
+            .Include(x => x.Reviewer)
+            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+        if (query is null)
+            return Result.Failure<ReviewResponse>(ReviewErrors.NotFound);
 
-    // TODO: GetReviewByIdAsync(reviewId) - individual review retrieval
-    // TODO: UpdateReviewAsync(reviewId, userId, request) - review modification
+        var response = query.Adapt<ReviewResponse>();
+        return Result.Success(response);
+    }
+    public async Task<Result> UpdateAsync(Guid bookId,Guid id, ReviewRequest request,CancellationToken cancellationToken = default)
+    {
+        var query = await _context.Reviews
+            .SingleOrDefaultAsync(x => x.Id.Equals(id) && x.BookId.Equals(bookId), cancellationToken);
+        if(query is null)
+            return Result.Failure(ReviewErrors.NotFound);
+        await _context.Reviews
+            .Where(x => x.Id.Equals(id) && x.BookId.Equals(bookId))
+            .ExecuteUpdateAsync(setter =>
+                setter
+                .SetProperty(x => x.Comment, request.Comment)
+                .SetProperty(x => x.Rating, request.Rating), cancellationToken: cancellationToken
+            );
+        return Result.Success();
+    }
     // TODO: DeleteReviewAsync(reviewId, userId) - review removal
     // TODO: GetBookReviewStatsAsync(bookId) - statistics and average rating
 }

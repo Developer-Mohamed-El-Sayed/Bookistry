@@ -46,11 +46,11 @@ public class CategoryService(ApplicationDbContext context) : ICategoryService
             return Result.Failure(CategoryErrors.DuplicateTitle);
         category = request.Adapt(category);
         await _context.Categories
-            .Where(c => c.Id == id)
-            .ExecuteUpdateAsync(setter =>
-            setter.SetProperty(c => c.Name, category.Name)       
-            .SetProperty(c => c.Description, category.Description)
-            , cancellationToken);
+                .Where(c => c.Id == id)
+                .ExecuteUpdateAsync(setter =>
+                setter.SetProperty(c => c.Name, category.Name)       
+                .SetProperty(c => c.Description, category.Description), cancellationToken
+               );
         return Result.Success();
     }
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
