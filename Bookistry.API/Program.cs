@@ -16,6 +16,8 @@ if(app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// TODO: User Profile 
+// TODO: Admin Panal 
 
 app.UseExceptionHandler();
 
