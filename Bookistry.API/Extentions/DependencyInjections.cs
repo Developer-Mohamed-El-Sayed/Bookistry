@@ -95,6 +95,7 @@ public static class DependencyInjections
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IReadingProgressService, ReadingProgressService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IBookHelpers, BookHelpers>();
         return services;
