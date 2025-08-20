@@ -6,8 +6,6 @@ public sealed class ApplicationUser : IdentityUser
     public string LastName { get; set; } = string.Empty;
     public bool IsDisabled { get; set; }
     public bool IsVIP { get; set; }
-    public string ProfileAvatar { get; set; } = string.Empty;
-
     public ICollection<Book> Books { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
     public ICollection<ReadingProgress> ReadingProgresses { get; set; } = [];

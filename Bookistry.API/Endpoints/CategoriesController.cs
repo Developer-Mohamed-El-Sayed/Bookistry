@@ -6,7 +6,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
 {
     private readonly ICategoryService _categoryService = categoryService;
     [HttpPost]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Create([FromBody] CategoryRequest request,CancellationToken cancellationToken)
     {
         var result = await _categoryService.CreateAsunc(request, cancellationToken);
@@ -20,21 +20,21 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpPut("{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CategoryRequest request, CancellationToken cancellationToken)
     {
         var result = await _categoryService.UpdateAsync(id, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpDelete("{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _categoryService.DeleteAsync(id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpPut("restore/{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _categoryService.RestoreAsync(id, cancellationToken);

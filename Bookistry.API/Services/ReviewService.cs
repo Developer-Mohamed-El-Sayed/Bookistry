@@ -93,6 +93,36 @@ public class ReviewService(
         await SetReviewDeleteAsync(review, false, cancellationToken);
         return Result.Success();
     }
+    public async Task<Result<ReviewStatsResponse>> GetBookReviewStatsAsync(Guid bookId, CancellationToken cancellationToken = default)
+    {
+        var bookExists = await _bookHelpers.GetBookExistsAsync(bookId, cancellationToken);
+        if (!bookExists)
+            return Result.Failure<ReviewStatsResponse>(BookErrors.NotFound);
+        var stats = await _context.Reviews
+            .Where(r => r.BookId == bookId && !r.IsDeleted)
+            .GroupBy(r => r.Rating)
+            .Select(g => new
+            {
+                Rating = g.Key,
+                Count = g.Count()
+            })
+            .ToListAsync(cancellationToken);
+
+        if (stats.Count == 0)
+            return Result.Failure<ReviewStatsResponse>(ReviewErrors.NotFound);
+        var totalReviews = stats.Sum(s => s.Count);
+        var averageRating = stats.Sum(s => s.Rating * s.Count) / (double)totalReviews;
+        var response = new ReviewStatsResponse(
+            totalReviews,
+            Math.Round(averageRating, 2),
+            stats.FirstOrDefault(x => x.Rating == 5)?.Count ?? 0,
+            stats.FirstOrDefault(x => x.Rating == 4)?.Count ?? 0,
+            stats.FirstOrDefault(x => x.Rating == 3)?.Count ?? 0,
+            stats.FirstOrDefault(x => x.Rating == 2)?.Count ?? 0,
+            stats.FirstOrDefault(x => x.Rating == 1)?.Count ?? 0
+        );
+        return Result.Success(response);
+    }
     private async Task SetReviewDeleteAsync(Review review,bool isDelete,CancellationToken cancellationToken = default)
     {
         review.IsDeleted = isDelete;
@@ -100,5 +130,5 @@ public class ReviewService(
         _context.Update(review);
         await _context.SaveChangesAsync(cancellationToken);
     }
-    // TODO: GetBookReviewStatsAsync(bookId) - statistics and average rating
+
 }

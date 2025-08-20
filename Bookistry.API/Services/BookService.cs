@@ -21,8 +21,8 @@ public class BookService(ApplicationDbContext context,
         if (await _userManager.FindByIdAsync(authorId) is not { } author)
             return Result.Failure<BookResponse>(UserErrors.NotFound);
 
-        if (await _userManager.IsInRoleAsync(author, DefaultRoles.Author.Name) is false)
-            return Result.Failure<BookResponse>(UserErrors.NotAuthor);
+        if (await _userManager.IsInRoleAsync(author, DefaultRoles.Admin.Name) is false)
+            return Result.Failure<BookResponse>(UserErrors.InvalidRole);
 
         if (await _context.Books.AnyAsync(x => x.Title == request.Title, cancellationToken))
             return Result.Failure<BookResponse>(BookErrors.DublicatedTitle);
@@ -196,7 +196,7 @@ public class BookService(ApplicationDbContext context,
                        $"{_filesPath}/{b.PdfFileUpload.StoredFileName}",
                        b.PublishedOn,
                        b.IsVIP ? SubscriptionType.VIP : SubscriptionType.Free,
-                       b.Reviews.Any() ? b.Reviews.Average(r => r.Rating) : 0,
+                       b.Reviews.Any() ? Math.Round(b.Reviews.Average(r => r.Rating),2) : 0,
                        b.ViewCount,
                        b.DownloadCount,
                        b.PageCount,
@@ -207,7 +207,7 @@ public class BookService(ApplicationDbContext context,
                            bc.Category.Description
                        )),
                        b.Reviews.Select(r => new ReviewResponse(
-                           r.Book.Author.UserName!,
+                           r.Reviewer.UserName!,
                            r.Rating,
                            r.Comment,
                            r.CreatedOn
@@ -299,8 +299,8 @@ public class BookService(ApplicationDbContext context,
         if (await _userManager.FindByIdAsync(authorId) is not { } author)
             return Result.Failure(UserErrors.NotFound);
 
-        if (await _userManager.IsInRoleAsync(author, DefaultRoles.Author.Name) is false)
-            return Result.Failure(UserErrors.NotAuthor);
+        if (await _userManager.IsInRoleAsync(author, DefaultRoles.Admin.Name) is false)
+            return Result.Failure(UserErrors.InvalidRole);
         book = request.Adapt(book);
 
         foreach (var items in request.CategoryDetails)
@@ -395,7 +395,7 @@ public class BookService(ApplicationDbContext context,
         if (book.AuthorId != authorId)
         {
             _logger.LogWarning("Author {AuthorId} is not authorized to delete book {BookId}", authorId, id);
-            return Result.Failure(UserErrors.NotAuthor);
+            return Result.Failure(UserErrors.InvalidRole);
         }
         if (book.IsDeleted)
         {
@@ -414,7 +414,7 @@ public class BookService(ApplicationDbContext context,
         if (book is null)
             return Result.Failure(BookErrors.NotFound);
         if (book.AuthorId != authorId)
-            return Result.Failure(UserErrors.NotAuthor);
+            return Result.Failure(UserErrors.InvalidRole);
         await SetBookDeletedStateAsync(book, false, cancellationToken);
         _logger.LogInformation("Book with Id {BookId} restored successfully", id);
         return Result.Success();

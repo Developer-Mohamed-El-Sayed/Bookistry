@@ -24,7 +24,7 @@ public class FavoritesController(IFavoriteService favoriteService) : ControllerB
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpGet]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> GetUserFavorite([FromRoute] Guid bookId, CancellationToken cancellationToken)
     {
         var result = await _favoriteService.GetUserFavoriteAsync(User.GetUserId(), bookId, cancellationToken);

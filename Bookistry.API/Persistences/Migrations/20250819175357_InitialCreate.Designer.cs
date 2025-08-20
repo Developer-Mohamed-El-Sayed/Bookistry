@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookistry.API.Persistences.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250816192906_InitialCreate")]
+    [Migration("20250819175357_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -58,15 +58,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.ToTable("AspNetRoles", (string)null);
 
                     b.HasData(
-                        new
-                        {
-                            Id = "868826A7-5589-4BF0-82DA-5E04408ADC8F",
-                            ConcurrencyStamp = "13071EF4-9B9D-4594-804F-1E8650DA4417",
-                            IsDefault = false,
-                            IsDeleted = false,
-                            Name = "Author",
-                            NormalizedName = "AUTHOR"
-                        },
                         new
                         {
                             Id = "4D447E8A-B35A-4DAE-BCE3-4552BF828693",
@@ -145,11 +136,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ProfileAvatar")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -175,27 +161,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "9422E5CF-06D6-422D-B3A6-C7E1E34B3A1C",
-                            Email = "admin@mahmoud.com",
-                            EmailConfirmed = true,
-                            FirstName = "Mahmoud",
-                            IsDisabled = false,
-                            IsVIP = true,
-                            LastName = "Yasser",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@MAHMOUD.COM",
-                            NormalizedUserName = "ADMIN@MAHMOUD.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
-                            PhoneNumberConfirmed = false,
-                            ProfileAvatar = "",
-                            SecurityStamp = "78A73231C42F47D4B13D2CF4A3672B51",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@mahmoud.com"
-                        },
-                        new
-                        {
                             Id = "4E14506C-D3C0-4AE3-8616-5EB95A764358",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "CE9E600E-ECD5-4400-92E6-986F63EEC953",
@@ -211,7 +176,6 @@ namespace Bookistry.API.Persistences.Migrations
                             PasswordHash = "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==",
                             PhoneNumber = "+201002308834",
                             PhoneNumberConfirmed = true,
-                            ProfileAvatar = "",
                             SecurityStamp = "2FCB053BC1F041F2B07D3E7608D8020E",
                             TwoFactorEnabled = false,
                             UserName = "dev@mohamed.com"
@@ -720,11 +684,6 @@ namespace Bookistry.API.Persistences.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
 
                     b.HasData(
-                        new
-                        {
-                            UserId = "DADA3B40-21CE-482A-8295-1C466E4B2B83",
-                            RoleId = "868826A7-5589-4BF0-82DA-5E04408ADC8F"
-                        },
                         new
                         {
                             UserId = "4E14506C-D3C0-4AE3-8616-5EB95A764358",

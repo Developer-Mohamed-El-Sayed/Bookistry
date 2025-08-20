@@ -38,7 +38,6 @@ namespace Bookistry.API.Persistences.Migrations
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsDisabled = table.Column<bool>(type: "bit", nullable: false),
                     IsVIP = table.Column<bool>(type: "bit", nullable: false),
-                    ProfileAvatar = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -514,27 +513,18 @@ namespace Bookistry.API.Persistences.Migrations
                 values: new object[,]
                 {
                     { "4D447E8A-B35A-4DAE-BCE3-4552BF828693", "E9FD0D85-6770-4A99-B3A2-69158B9EF3D7", true, false, "Reader", "READER" },
-                    { "868826A7-5589-4BF0-82DA-5E04408ADC8F", "13071EF4-9B9D-4594-804F-1E8650DA4417", false, false, "Author", "AUTHOR" },
                     { "8757DDE1-DA74-4A92-9EEB-46C4A35AC090", "F167EA47-FC22-4A47-81F9-1E21C11DB217", false, false, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsDisabled", "IsVIP", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "ProfileAvatar", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "4E14506C-D3C0-4AE3-8616-5EB95A764358", 0, "CE9E600E-ECD5-4400-92E6-986F63EEC953", "dev@mohamed.com", true, "Mohamed", false, true, "El Sayed", false, null, "DEV@MOHAMED.COM", "DEV@MOHAMED.COM", "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==", "+201002308834", true, "", "2FCB053BC1F041F2B07D3E7608D8020E", false, "dev@mohamed.com" },
-                    { "DADA3B40-21CE-482A-8295-1C466E4B2B83", 0, "9422E5CF-06D6-422D-B3A6-C7E1E34B3A1C", "admin@mahmoud.com", true, "Mahmoud", false, true, "Yasser", false, null, "ADMIN@MAHMOUD.COM", "ADMIN@MAHMOUD.COM", "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==", null, false, "", "78A73231C42F47D4B13D2CF4A3672B51", false, "admin@mahmoud.com" }
-                });
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsDisabled", "IsVIP", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "4E14506C-D3C0-4AE3-8616-5EB95A764358", 0, "CE9E600E-ECD5-4400-92E6-986F63EEC953", "dev@mohamed.com", true, "Mohamed", false, true, "El Sayed", false, null, "DEV@MOHAMED.COM", "DEV@MOHAMED.COM", "AQAAAAIAAYagAAAAEKj70KPmPc7BxyRhD9MuptCGolRkbmTp27lM/5HLVQxdU/qZw0HwYDAGR9JyB4c19Q==", "+201002308834", true, "2FCB053BC1F041F2B07D3E7608D8020E", false, "dev@mohamed.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[,]
-                {
-                    { "8757DDE1-DA74-4A92-9EEB-46C4A35AC090", "4E14506C-D3C0-4AE3-8616-5EB95A764358" },
-                    { "868826A7-5589-4BF0-82DA-5E04408ADC8F", "DADA3B40-21CE-482A-8295-1C466E4B2B83" }
-                });
+                values: new object[] { "8757DDE1-DA74-4A92-9EEB-46C4A35AC090", "4E14506C-D3C0-4AE3-8616-5EB95A764358" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

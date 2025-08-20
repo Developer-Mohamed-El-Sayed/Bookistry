@@ -13,7 +13,7 @@ public class BooksController(IBookService bookService) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpPost]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Create([FromForm] CreateBookRequest request,CancellationToken cancellationToken)
     {
         var result = await _bookService.CreateAsync(User.GetUserId(),request,cancellationToken);
@@ -35,21 +35,21 @@ public class BooksController(IBookService bookService) : ControllerBase
             : result.ToProblem();
     }
     [HttpPut("{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Update([FromRoute] Guid id, [FromForm] UpdateBookRequest request,CancellationToken cancellationToken)
     {
         var result = await _bookService.UpdateAsync(User.GetUserId(),id,request,cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpDelete("{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _bookService.DeleteAsync(User.GetUserId(),id,cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpPut("restore/{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _bookService.RestoreAsync(User.GetUserId(),id,cancellationToken);

@@ -49,10 +49,16 @@ global using Bookistry.API.Contracts.BookReadingProgress.Requests;
 global using Bookistry.API.Contracts.BookReadingProgress.Responses;
 global using Bookistry.API.Helpers;
 global using Bookistry.API.Validations.Common;
-global using static Bookistry.API.Settings.FileSettings;
 global using Microsoft.Extensions.Caching.Hybrid;
 global using Microsoft.OpenApi.Models;
 global using Bookistry.API.Contracts.Favorites.Responses;
+global using Bookistry.API.Contracts.Users.Responses;
+global using Bookistry.API.Contracts.Users.Requests;
+global using Bookistry.API.Contracts.Roles.Requests;
+global using Bookistry.API.Contracts.Roles.Responses;
+
+
+
 
 
 

@@ -18,7 +18,9 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
 
         RuleFor(x => x.PageCount)
             .GreaterThan(0)
-            .WithMessage("Page count must be greater than 0.");
+            .WithMessage("Page count must be greater than 0.")
+            .LessThanOrEqualTo(5000)
+            .WithMessage("Page count must be less than or equal to 5000.");
 
         RuleFor(x => x.AuthorName)
             .NotEmpty()

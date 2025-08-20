@@ -7,13 +7,6 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
         builder.HasData([
             new ApplicationRole
             {
-                Id = DefaultRoles.Author.Id,
-                Name = DefaultRoles.Author.Name,
-                NormalizedName = DefaultRoles.Author.Name.ToUpper(),
-                ConcurrencyStamp = DefaultRoles.Author.ConcurrencyStamp
-            },
-            new ApplicationRole
-            {
                 Id = DefaultRoles.Reader.Id,
                 Name = DefaultRoles.Reader.Name,
                 NormalizedName = DefaultRoles.Reader.Name.ToUpper(),

@@ -1,4 +1,6 @@
-﻿namespace Bookistry.API.Validations.Common;
+﻿using static Bookistry.API.Settings.FileSettings;
+
+namespace Bookistry.API.Validations.Common;
 
 public class FileExtenstionValidator : AbstractValidator<IFormFile>
 {

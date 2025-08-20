@@ -8,7 +8,7 @@ public class ReviewsController(IReviewService reviewService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateReview([FromRoute] Guid bookId, [FromBody] ReviewRequest request, CancellationToken cancellationToken)
     {
-        var result = await _reviewService.CreateAsync(bookId,User.GetUserId(), request, cancellationToken);
+        var result = await _reviewService.CreateAsync(bookId, User.GetUserId(), request, cancellationToken);
         return result.IsSuccess ? Created() : result.ToProblem();
     }
     [HttpGet]
@@ -18,29 +18,37 @@ public class ReviewsController(IReviewService reviewService) : ControllerBase
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpGet("{id}")]
-    [Authorize(Roles = DefaultRoles.Author.Name)]
-    public async Task<IActionResult> Get([FromRoute] Guid bookId, [FromRoute] Guid id,CancellationToken cancellationToken)
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
+    public async Task<IActionResult> Get([FromRoute] Guid bookId, [FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _reviewService.GetAsync(bookId, id, cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] Guid bookId, [FromRoute] Guid id, [FromBody] ReviewRequest request,CancellationToken cancellationToken)
+    public async Task<IActionResult> Update([FromRoute] Guid bookId, [FromRoute] Guid id, [FromBody] ReviewRequest request, CancellationToken cancellationToken)
     {
-        var result = await _reviewService.UpdateAsync(bookId,id,request,cancellationToken);
+        var result = await _reviewService.UpdateAsync(bookId, id, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid bookId,Guid id,CancellationToken cancellationToken)
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
+    public async Task<IActionResult> Delete([FromRoute] Guid bookId, Guid id, CancellationToken cancellationToken)
     {
         var result = await _reviewService.DeleteAsync(bookId, id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
-    [HttpPut("restore/{id}")] //TODO: apply the role when delete and restore.
+    [HttpPut("restore/{id}")]
+    [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid bookId, Guid id, CancellationToken cancellationToken)
     {
         var result = await _reviewService.RestoreAsync(bookId, id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
+    [HttpGet("count")]
+    public async Task<IActionResult> GetCount([FromRoute] Guid bookId, CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.GetBookReviewStatsAsync(bookId, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
 
+    }
 }

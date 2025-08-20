@@ -46,6 +46,13 @@ public class MappingConfiguration : IRegister
             .Map(dest => dest.Description, src => src.Description)
             .Map(dest => dest.IsVIP, src => src.IsVIP)
             .Map(dest => dest.PageCount, src => src.PageCount);
+
+        config.NewConfig<ApplicationUser, UserProfileResponse>()
+        .Map(dest => dest.FullName,
+             src => (
+                 (src.FirstName ?? "").Trim() + " " + (src.LastName ?? "").Trim()
+             ).Trim()
+        );
     }
 
     private static string GetFirstName(string fullName)

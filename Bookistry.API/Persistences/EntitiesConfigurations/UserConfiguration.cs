@@ -12,8 +12,6 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(p => p.ProfileAvatar)
-            .HasMaxLength(300);
         builder
             .OwnsMany(r => r.RefreshTokens)
             .ToTable("RefreshTokens")
@@ -21,21 +19,6 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
             .HasForeignKey("UserId");
 
         builder.HasData([
-            new ApplicationUser
-            {
-                Id = DefaultUsers.Author.Id,
-                FirstName = DefaultUsers.Author.FirstName,
-                LastName = DefaultUsers.Author.LastName,
-                Email = DefaultUsers.Author.Email,
-                NormalizedEmail = DefaultUsers.Author.Email.ToUpper(),
-                UserName = DefaultUsers.Author.Email,
-                NormalizedUserName = DefaultUsers.Author.Email.ToUpper(),
-                PasswordHash = DefaultUsers.Author.Password,
-                EmailConfirmed = true,
-                SecurityStamp  = DefaultUsers.Author.SecurityStamp,
-                ConcurrencyStamp = DefaultUsers.Author.ConcurrencyStamp,
-                IsVIP = true
-            },
             new ApplicationUser
             {
                 Id = DefaultUsers.Admin.Id,

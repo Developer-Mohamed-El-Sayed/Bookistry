@@ -92,6 +92,8 @@ public static class DependencyInjections
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IReadingProgressService, ReadingProgressService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IBookHelpers, BookHelpers>();
@@ -171,7 +173,6 @@ public static class DependencyInjections
     }
     private static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
-        // fix the Implementation 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
@@ -193,11 +194,12 @@ public static class DependencyInjections
 
             c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                In = ParameterLocation.Header,
-                Description = "Please insert JWT with Bearer into field",
                 Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = JwtBearerDefaults.AuthenticationScheme
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer", 
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter 'Bearer' [space] and then your token.\r\nExample: \"Bearer abc123\""
             });
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -215,6 +217,8 @@ public static class DependencyInjections
                 }
             });
         });
+
         return services;
     }
+
 }
