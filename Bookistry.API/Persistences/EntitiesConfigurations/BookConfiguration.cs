@@ -28,7 +28,7 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(b => b.PageCount)
                .IsRequired();
 
-        builder.HasIndex(b => b.Title);
+        builder.HasIndex(b => b.Title).IsUnique();
         builder.HasIndex(b => b.IsVIP);
         builder.HasIndex(b => b.PublishedOn);
         builder.HasIndex(b => b.AverageRating);
@@ -59,5 +59,7 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
                 img.Property(x => x.FileExtension).HasMaxLength(10);
                 img.Property(x => x.ContentType).HasMaxLength(50);
             });
+
+        builder.HasIndex(x => x.Title).IsUnique();
     }
 }
