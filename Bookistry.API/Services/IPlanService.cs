@@ -9,7 +9,7 @@ public interface IPlanService
     Task<Result<IEnumerable<SubscriptionPlanResponse>>> SearchPlansAsync(string keyword, CancellationToken cancellationToken = default);
     Task<Result<bool>> CheckPlanExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result<IEnumerable<SubscriptionPlanResponse>>> GetPlansByTypeAsync(string type, CancellationToken cancellationToken = default);
-    Task<Result> RevokeAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<Result> RenewAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result> RevokePlanAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result> RenewPlanAsync(Guid id, CancellationToken cancellationToken = default);
 
 }

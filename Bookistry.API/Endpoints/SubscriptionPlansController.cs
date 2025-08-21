@@ -50,13 +50,13 @@ public class SubscriptionPlansController(IPlanService planService) : ControllerB
     [HttpDelete("{id}")]
     public async Task<IActionResult> Revoke([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var result = await _planService.RevokeAsync(id, cancellationToken);
+        var result = await _planService.RevokePlanAsync(id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
     [HttpPatch("{id}/renew")]
     public async Task<IActionResult> Renew([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var result = await _planService.RenewAsync(id, cancellationToken);
+        var result = await _planService.RenewPlanAsync(id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
