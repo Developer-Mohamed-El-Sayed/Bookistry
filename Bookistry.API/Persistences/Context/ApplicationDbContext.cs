@@ -50,6 +50,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<ReadingProgress> ReadingProgresses => Set<ReadingProgress>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<Payment> Payments => Set<Payment>();
 
