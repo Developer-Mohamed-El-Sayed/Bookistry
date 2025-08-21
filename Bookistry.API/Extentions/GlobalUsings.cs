@@ -56,7 +56,8 @@ global using Bookistry.API.Contracts.Users.Responses;
 global using Bookistry.API.Contracts.Users.Requests;
 global using Bookistry.API.Contracts.Roles.Requests;
 global using Bookistry.API.Contracts.Roles.Responses;
-
+global using Bookistry.API.Contracts.SubscriptionPlans.Requests;
+global using Bookistry.API.Contracts.SubscriptionPlans.Responses;
 
 
 

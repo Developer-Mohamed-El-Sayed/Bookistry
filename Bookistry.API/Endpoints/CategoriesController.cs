@@ -33,7 +33,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         var result = await _categoryService.DeleteAsync(id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
-    [HttpPut("restore/{id}")]
+    [HttpPatch("restore/{id}")]
     [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
     {

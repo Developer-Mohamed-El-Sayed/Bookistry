@@ -48,7 +48,7 @@ public class BooksController(IBookService bookService) : ControllerBase
         var result = await _bookService.DeleteAsync(User.GetUserId(),id,cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
-    [HttpPut("restore/{id}")]
+    [HttpPatch("restore/{id}")]
     [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid id, CancellationToken cancellationToken)
     {

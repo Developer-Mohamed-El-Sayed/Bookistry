@@ -94,6 +94,7 @@ public static class DependencyInjections
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<IReadingProgressService, ReadingProgressService>();
         services.AddScoped<IUserService, UserService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();

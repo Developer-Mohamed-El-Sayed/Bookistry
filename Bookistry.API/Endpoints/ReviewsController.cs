@@ -37,7 +37,7 @@ public class ReviewsController(IReviewService reviewService) : ControllerBase
         var result = await _reviewService.DeleteAsync(bookId, id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
-    [HttpPut("restore/{id}")]
+    [HttpPatch("restore/{id}")]
     [Authorize(Roles = DefaultRoles.Admin.Name)]
     public async Task<IActionResult> Restore([FromRoute] Guid bookId, Guid id, CancellationToken cancellationToken)
     {
