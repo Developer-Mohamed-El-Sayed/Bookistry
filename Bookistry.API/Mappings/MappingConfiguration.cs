@@ -53,6 +53,17 @@ public class MappingConfiguration : IRegister
                  (src.FirstName ?? "").Trim() + " " + (src.LastName ?? "").Trim()
              ).Trim()
         );
+
+
+        config.NewConfig<(ApplicationUser user, IList<string> roles), UserResponse>()
+            .Map(dest => dest, src => src.user)
+            .Map(dest => dest.Roles, src => src.roles);
+
+        config.NewConfig<CreateUserRequest, ApplicationUser>()
+            .Map(dest => dest.EmailConfirmed, src => true); // userName
+
+        config.NewConfig<UpdateUserRequest, ApplicationUser>()
+            .Map(dest => dest.NormalizedEmail, src => src.Email.ToUpper());
     }
 
     private static string GetFirstName(string fullName)

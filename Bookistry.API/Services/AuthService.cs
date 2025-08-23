@@ -3,13 +3,15 @@
 public class AuthService(
         UserManager<ApplicationUser> userManager,
         IJwtProvider jwtProvider,
-        SignInManager<ApplicationUser> signInManager
+        SignInManager<ApplicationUser> signInManager,
+        IUserHelpers userHelpers
     )
     : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private readonly IUserHelpers _userHelpers = userHelpers;
     private const int _refreshTokenExpirationDays = 30;
 
     public async Task<Result<AuthResponse>> SignUpAsync(SignUpRequest request, CancellationToken cancellationToken = default)
@@ -20,7 +22,7 @@ public class AuthService(
             return Result.Failure<AuthResponse>(UserErrors.DublicatedEmail);
         var user = request.Adapt<ApplicationUser>();
 
-        user.UserName = GetUserName(request.Email);
+        user.UserName = _userHelpers.GetUserName(request.Email);
 
         var result = await _userManager.CreateAsync(user, request.Password);
             await _userManager.AddToRoleAsync(user,DefaultRoles.Reader.Name);
@@ -54,7 +56,7 @@ public class AuthService(
         {
             user = new ApplicationUser
             {
-                UserName = GetUserName(payload.Email),
+                UserName = _userHelpers.GetUserName(payload.Email),
                 Email = payload.Email,
                 FirstName = payload.GivenName ?? string.Empty,
                 LastName = payload.FamilyName ?? string.Empty,
@@ -178,12 +180,6 @@ public class AuthService(
             refreshToken,
             refreshTokenExpiration
         );
-    }
-    private static string GetUserName(string? email)
-    {
-        if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
-            return string.Empty;
-        return email.Split('@')[0];
     }
 
 }

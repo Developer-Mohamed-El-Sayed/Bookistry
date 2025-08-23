@@ -1,9 +1,15 @@
 ﻿namespace Bookistry.API.Services;
 
-public class UserService(UserManager<ApplicationUser> userManager, ApplicationDbContext context) : IUserService
+public class UserService(UserManager<ApplicationUser> userManager,
+    ApplicationDbContext context,
+    IRoleService roleService,
+    IUserHelpers userHelpers
+    ) : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ApplicationDbContext _context = context;
+    private readonly IRoleService _roleService = roleService;
+    private readonly IUserHelpers _userHelpers = userHelpers;
 
     public async Task<Result<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -77,6 +83,57 @@ public class UserService(UserManager<ApplicationUser> userManager, ApplicationDb
         var error = result.Errors.First();
         return Result.Failure(new Error(error.Code,error.Description,StatusCodes.Status423Locked));
     }
-
+    public async Task<Result<UserResponse>> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+    {
+        if(await _userManager.Users.AnyAsync(u => u.Email == request.Email, cancellationToken))
+            return Result.Failure<UserResponse>(UserErrors.DublicatedEmail);
+        var allowedRoles = await _roleService.GetAllRolesAsync(cancellationToken);
+        if(request.Roles.Except(allowedRoles.Select(r => r.Name)).Any())
+            return Result.Failure<UserResponse>(RoleErrors.InvalidRoles);
+        var user = request.Adapt<ApplicationUser>();
+        user.UserName = _userHelpers.GetUserName(request.Email);
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRolesAsync(user, request.Roles);
+            var response = (user,request.Roles).Adapt<UserResponse>();
+            return Result.Success(response);
+        }
+        var error = result.Errors.First();
+        return Result.Failure<UserResponse>(new Error(error.Code,error.Description,StatusCodes.Status422UnprocessableEntity));
+    }
+    public async Task<Result> UpdateAsync(string id, UpdateUserRequest request, CancellationToken cancellationToken = default)
+    {
+        if (await _userManager.FindByIdAsync(id) is not { } user)
+            return Result.Failure(UserErrors.NotFound);
+        if (await _userManager.Users.AnyAsync(u => u.Email == request.Email && u.Id != id, cancellationToken))
+            return Result.Failure(UserErrors.DublicatedEmail);
+        var allowedRoles = await _roleService.GetAllRolesAsync(cancellationToken);
+        if (request.Roles.Except(allowedRoles.Select(r => r.Name)).Any())
+            return Result.Failure(RoleErrors.InvalidRoles);
+        user = request.Adapt(user);
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            await _context.UserRoles
+                .Where(x => x.UserId.Equals(id))
+                .ExecuteDeleteAsync(cancellationToken);
+            await _userManager.AddToRolesAsync(user, request.Roles);
+            return Result.Success();
+        }
+        var error = result.Errors.First();
+        return Result.Failure(new Error(error.Code,error.Description,StatusCodes.Status422UnprocessableEntity));
+    }
+    public async Task<Result> ToggleStatusAsync(string id)
+    {
+        if (await _userManager.FindByIdAsync(id) is not { } user)
+            return Result.Failure(UserErrors.NotFound);
+        user.IsDisabled = !user.IsDisabled;
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+            return Result.Success();
+        var error = result.Errors.First();
+        return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+    }
 
 }

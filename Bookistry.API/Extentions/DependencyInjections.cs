@@ -99,6 +99,7 @@ public static class DependencyInjections
         services.AddScoped<IUserService, UserService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IBookHelpers, BookHelpers>();
+        services.AddScoped<IUserHelpers, UserHelpers>();
         return services;
     }
     private static IServiceCollection AddErrorHandling(this IServiceCollection services)

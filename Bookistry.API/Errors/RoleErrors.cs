@@ -6,4 +6,6 @@ public record RoleErrors
         new("RoleNotFound","The specified role was not found.",StatusCodes.Status404NotFound );
     public static readonly Error RoleAlreadyExists =
         new("RoleAlreadyExists", "A role with the same name already exists.", StatusCodes.Status409Conflict);
+    public static readonly Error InvalidRoles =
+        new("InvalidRoleName", "The role name provided is invalid.", StatusCodes.Status400BadRequest);
 }
