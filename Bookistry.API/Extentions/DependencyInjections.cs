@@ -100,6 +100,7 @@ public static class DependencyInjections
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddScoped<IBookHelpers, BookHelpers>();
         services.AddScoped<IUserHelpers, UserHelpers>();
+        services.AddScoped<ISubscriptionService, SubscriptionService>();
         return services;
     }
     private static IServiceCollection AddErrorHandling(this IServiceCollection services)
