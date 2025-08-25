@@ -37,5 +37,12 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
                 IsVIP = true
             }
         ]);
+
+        builder.HasIndex(u => u.StripeCustomerId)
+       .IsUnique();
+
+        builder.Property(u => u.StripeCustomerId)
+        .HasMaxLength(255)
+        .IsRequired(false);
     }
 }

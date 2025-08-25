@@ -14,6 +14,7 @@ public static class DependencyInjections
            .AddRateLimitConfig()
            .AddCacheConfig()
            .AddSwaggerConfig()
+           .AddPaymentConfig()
            .AddCORSConfig(configuration)
            .AddHealthCheckConfig(configuration)
            .AddConnectionConfig(configuration)
@@ -222,6 +223,14 @@ public static class DependencyInjections
             });
         });
 
+        return services;
+    }
+    private static IServiceCollection AddPaymentConfig(this IServiceCollection services)
+    {
+        services.AddOptions<PaymentGatewaySettings>()
+            .BindConfiguration(PaymentGatewaySettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
         return services;
     }
 

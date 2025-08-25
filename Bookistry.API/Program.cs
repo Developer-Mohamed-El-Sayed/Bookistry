@@ -15,7 +15,7 @@ if(app.Environment.IsDevelopment())
     app.MapSwagger();
     app.UseSwaggerUI();
 }
-// TODO: Add User Service and endpoint for users
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
